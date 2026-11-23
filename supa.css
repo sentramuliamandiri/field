@@ -23,3 +23,5 @@ body.lg-on>*:not(#smmLogin):not(script){visibility:hidden}
 .us-add .rpw .ghost{border-left:1px solid var(--line);border-radius:0;white-space:nowrap}
 #gudAcct{margin-left:auto}
 @media (max-width:640px){.us-list li{grid-template-columns:1fr}.us-a{justify-content:flex-start}.us-a select{flex:1 1 100%}}
+#smmUpd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;gap:10px;align-items:center;background:#1b3264;color:#fff;padding:8px 10px 8px 14px;border-radius:12px;box-shadow:0 8px 24px rgba(20,36,74,.25);font-size:13.5px;max-width:calc(100% - 24px)}
+#smmUpd button{background:#2e7d4f;color:#fff;border:0;border-radius:8px;padding:6px 12px;font-weight:700}

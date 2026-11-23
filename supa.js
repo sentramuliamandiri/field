@@ -343,6 +343,24 @@
     }
   }
 
+  /* ---------------- versi baru ---------------- */
+  const BUILD = document.querySelector('meta[name="smm-build"]')?.content || "";
+  async function checkUpdate() {
+    if (!BUILD) return;
+    try {
+      const t = await _fetch("index.html?cb=" + Date.now(), { cache: "no-store" }).then((r) => r.text());
+      const m = t.match(/name="smm-build" content="(\d+)"/);
+      if (m && m[1] !== BUILD && !document.getElementById("smmUpd")) {
+        const b = document.createElement("div"); b.id = "smmUpd";
+        b.innerHTML = `<span>Versi baru aplikasi tersedia.</span><button type="button">Muat ulang</button>`;
+        b.querySelector("button").onclick = () => location.reload();
+        document.body.appendChild(b);
+      }
+    } catch {}
+  }
+  setInterval(checkUpdate, 5 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(); });
+
   /* ---------------- start ---------------- */
   (async () => {
     if (!CFG.url || !CFG.key) { shell(`<h1>Belum dikonfigurasi</h1><p class="lg-sub">Isi alamat dan kunci Supabase di config.js.</p>`); return; }
