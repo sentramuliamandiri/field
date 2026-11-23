@@ -1,5 +1,6 @@
-/* Alamat project Supabase dan kunci publik (anon). Kunci ini memang untuk publik; data dilindungi aturan akses di database. */
-window.SMM_CONFIG = {
-  url: "https://xyykjezymkzchganpkml.supabase.co",
-  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5eWtqZXp5bWt6Y2hnYW5wa21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NjE0MTcsImV4cCI6MjExMDAzNzQxN30._ufXlzqysSArKf0jXKFxdkcZPDNAYJEsrVWTyQM-MgI"
-};
+/* Alamat project Supabase. Kunci publik (anon) disimpan di anon-key.txt — kunci ini memang untuk publik; data dilindungi aturan akses di database. */
+(function () {
+  var key = "";
+  try { var x = new XMLHttpRequest(); x.open("GET", "anon-key.txt?v=" + Date.now(), false); x.send(); if (x.status === 200) key = x.responseText.trim(); } catch (e) {}
+  window.SMM_CONFIG = { url: "https://nlxqrqupsjbeyhondyup.supabase.co", key: key };
+})();
