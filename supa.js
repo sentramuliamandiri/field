@@ -226,7 +226,7 @@
   function shell(inner) {
     let el = document.getElementById("smmLogin");
     if (!el) { el = document.createElement("div"); el.id = "smmLogin"; document.body.appendChild(el); }
-    el.innerHTML = `<div class="lg-card"><div class="lg-brand"><span class="logo">SMM</span><div><b>Tracking Pengadaan</b><span>PT Sentra Mulia Mandiri</span></div></div>${inner}</div>`;
+    el.innerHTML = `<div class="lg-card"><div class="lg-brand"><img class="lg-logo" src="logo.svg" alt="Logo SMM"><div><b>Tracking Pengadaan</b><span>PT Sentra Mulia Mandiri</span></div></div>${inner}</div>`;
     el.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = () => { const i = document.getElementById(b.dataset.eye); i.type = i.type === "password" ? "text" : "password"; b.textContent = i.type === "password" ? "Lihat" : "Sembunyi"; }));
     document.body.classList.add("lg-on"); return el;
   }
