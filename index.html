@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261123151954"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261123155305"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -707,10 +707,10 @@ a{color:var(--ink)}
 <div id="overlay"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261123151954">
-<script src="config.js?v=20261123151954"></script>
+<link rel="stylesheet" href="supa.css?v=20261123155305">
+<script src="config.js?v=20261123155305"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261123151954"></script>
+<script src="supa.js?v=20261123155305"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -2486,6 +2486,12 @@ function aiErr(e){const c=e?.code;
   if(c==="invalid_json"||c==="empty_completion")return "Hasil bacaan tidak terbaca rapi. Coba lagi.";
   if(c==="images_unavailable")return "Pengiriman gambar ke AI tidak tersedia; muat ulang halaman agar memakai pembaca teks (OCR).";
   if(c==="pdf"||c==="ocr")return e.message;
+  if(c==="no_key")return "Kunci AI belum dipasang di server (ANTHROPIC_API_KEY di Supabase → Edge Functions → Secrets). Sementara, tempel teks lalu klik \"Baca teks\" atau isi manual.";
+  if(c==="unauthorized")return "Akun ini tidak punya akses ke pembaca AI, atau sesi login berakhir. Coba keluar lalu masuk lagi.";
+  if(c==="network")return "Tidak bisa menghubungi server AI. Periksa koneksi internet lalu coba lagi.";
+  if(c==="ai_error"){const m=String(e?.message||"");if(/credit balance|billing|insufficient/i.test(m))return "Saldo kredit kunci AI (Anthropic) habis atau belum diisi. Isi saldo di console.anthropic.com → Billing, lalu coba lagi.";
+    if(/api[_ ]key|authentication|x-api-key/i.test(m))return "Kunci AI di server tidak valid. Periksa ANTHROPIC_API_KEY di Supabase → Edge Functions → Secrets.";
+    if(/model/i.test(m))return "Model AI tidak dikenali server: "+m;return "Server AI gagal membaca: "+m}
   return "Pembacaan gagal. Coba lagi."+(c?" (kode: "+c+")":e?.message?" ("+String(e.message).slice(0,120)+")":"");}
 function mapDocs(res){return splitDocs((res?.docs||[]).map(d=>({rfqNo:String(d.rfqNo||"").trim(),date:/^\d{4}-\d{2}-\d{2}$/.test(d.date||"")?d.date:"",customer:String(d.customer||"").trim(),continued:!!d.continued,
   items:(d.items||[]).map(i=>({part:String(i.partNumber||"").trim(),desc:String(i.name||"").trim(),unitAlat:String(i.unit||"").trim(),qty:Number(i.qty)||1,unit:String(i.uom||"").trim().toUpperCase(),check:!!i.check,rfqNo:String(i.rfqNo||"").trim()}))})))}
