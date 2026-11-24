@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124124724"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124130850"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -707,10 +707,10 @@ a{color:var(--ink)}
 <div id="overlay"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124124724">
-<script src="config.js?v=20261124124724"></script>
+<link rel="stylesheet" href="supa.css?v=20261124130850">
+<script src="config.js?v=20261124130850"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124124724"></script>
+<script src="supa.js?v=20261124130850"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1562,6 +1562,49 @@ async function readDocText(f,onMsg){
 const CPO_PROMPT=`Teks berikut adalah Purchase Order (PO) dari customer kepada PT Sentra Mulia Mandiri (supplier spare parts alat berat & truk). Teks bisa berasal dari OCR sehingga ada salah baca karakter (O/0, I/1, S/5) dan kolom tercampur.
 Ambil: nomor PO, tanggal PO (format YYYY-MM-DD), nama perusahaan pembeli, dan setiap baris barang yang dipesan: part number (jika ada), nama/deskripsi barang, qty (angka), satuan, harga satuan (rupiah angka penuh, tanpa titik; "Rp 1.250.000" = 1250000), dan catatan pengiriman/moda (mis. "via laut", "udara") bila tertulis per baris atau untuk seluruh PO.
 Abaikan baris subtotal, PPN, ongkir, dan total. Balas JSON: {"poNo":"","poDate":"","customer":"","shipMode":"","lines":[{"partNumber":"","description":"","qty":0,"unit":"","unitPrice":0,"note":""}]}`;
+/* Pembaca PO tanpa AI: teks PDF / OCR -> no. PO, tanggal, baris barang; plus pencarian part number barang terbuka di teks. */
+const MONID={jan:1,januari:1,january:1,feb:2,februari:2,february:2,mar:3,maret:3,march:3,apr:4,april:4,mei:5,may:5,jun:6,juni:6,june:6,jul:7,juli:7,july:7,agu:8,agt:8,agustus:8,aug:8,august:8,sep:9,sept:9,september:9,okt:10,oktober:10,oct:10,october:10,nov:11,november:11,nop:11,nopember:11,des:12,desember:12,dec:12,december:12};
+function ruleDate(t){let m=String(t).match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](20\d{2})\b/);if(m&&+m[2]<=12)return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  m=String(t).match(/\b(20\d{2})[\/.-](\d{1,2})[\/.-](\d{1,2})\b/);if(m)return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m=String(t).match(/\b(\d{1,2})[\s.-]*([A-Za-z]{3,9})[\s.,-]*(20\d{2})\b/);if(m&&MONID[m[2].toLowerCase()])return `${m[3]}-${String(MONID[m[2].toLowerCase()]).padStart(2,"0")}-${m[1].padStart(2,"0")}`;return ""}
+const rulePrice=s=>{s=String(s).replace(/^Rp\.?\s*/i,"").trim();if(/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(s))return Number(s.replace(/\./g,"").replace(",","."));if(/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/.test(s))return Number(s.replace(/,/g,""));if(/^\d{4,}([.,]\d{1,2})?$/.test(s))return Number(s.replace(",","."));return NaN};
+function ruleParsePo(text){
+  const lines=String(text||"").split(/\r?\n/).map(l=>l.replace(/[|¦]/g,"  ").replace(/\s+$/,"")).filter(l=>l.trim());
+  const all=lines.join("\n");let poNo="",poDate="",customer="";
+  const pm=all.match(/(?:P\.?\s?O\.?|Purchase\s+Order|Pesanan(?:\s+Pembelian)?|Order)\s*(?:No\.?|Number|Nomor|#)?\s*[:.]?\s*([A-Z0-9][A-Z0-9\/._-]{3,40})/i);
+  if(pm&&/\d/.test(pm[1]))poNo=pm[1].replace(/[.,]$/,"");
+  if(!poNo){const m=all.match(/\b(\d{1,6}\/[A-Z0-9.-]*PO[A-Z0-9.\/-]*|PO[\/-][A-Z0-9\/.-]{3,})\b/i);if(m)poNo=m[1]}
+  const dl=lines.find(l=>/(tanggal|tgl|date)\b/i.test(l)&&ruleDate(l));poDate=dl?ruleDate(dl):ruleDate(all);
+  for(const l of lines.slice(0,25)){const m=l.match(/\b(PT\.?\s*[A-Z][\w.&,\s-]{2,60}?|CV\.?\s*[A-Z][\w.&,\s-]{2,60}?)(?=\s{2,}|\s*\(|$)/);if(m&&!/sentra\s*mulia/i.test(m[1])){customer=m[1].replace(/\s+/g," ").trim();break}}
+  const shipMode=/\b(udara|air\s*freight|by\s*air|via\s*air)\b/i.test(all)?"udara":/\b(laut|sea\s*freight|by\s*sea|via\s*sea|kapal)\b/i.test(all)?"laut":"";
+  const UN=new RegExp("^(?:"+RULE_UNITS+")\\.?$","i");const out=[];let pend=[],carry=null;
+  const NUMQ=/^\d{1,5}([.,]\d{1,3})?$/;
+  const tryRow=l=>{const toks=l.trim().split(/\s+/);let qi=-1,ui=-1;
+    for(let k=1;k<toks.length;k++){if(UN.test(toks[k])){if(k>1&&NUMQ.test(toks[k-1])){qi=k-1;ui=k}else if(NUMQ.test(toks[k+1]||"")){qi=k+1;ui=k}if(qi>0)break}}
+    if(qi<0){const pr=toks.findIndex((t,k)=>k>1&&/^(Rp\.?)?(\d{1,3}([.,]\d{3})+([.,]\d{1,2})?|\d{5,})$/i.test(t)&&rulePrice(t)>=100);if(pr>1){for(let k=pr-1;k>0;k--)if(/^\d{1,4}$/.test(toks[k])){qi=k;break}}}
+    if(qi<0)return null;
+    const first=ui<0?qi:Math.min(qi,ui);const desc=toks.slice(1,first).join(" ");
+    const prices=toks.slice(Math.max(qi,ui)+1).map(rulePrice).filter(n=>n>=100);
+    if(!desc&&!prices.length)return null;
+    const p=rulePart(desc);const qty=Number(String(toks[qi]).replace(",","."))||0;
+    let unitPrice=prices[0]||0;if(prices.length>=2&&qty>1&&Math.abs(prices[0]-prices[1]*qty)<prices[0]*.02)unitPrice=prices[1];
+    return {partNumber:p.part,description:p.desc,qty,unit:ui>0?toks[ui].toUpperCase().replace(/\.$/,""):"",unitPrice}};
+  const STOP=/(total|ppn|vat|subtotal|discount|diskon|terbilang|catatan|note|syarat|term)/i;
+  for(const l of lines){
+    const isRow=/^\s*\d{1,3}[.)]?\s+\S/.test(l);
+    if(!isRow&&carry){if(STOP.test(l)){carry=null;continue}const r=tryRow(carry+" "+l.trim());if(r){out.push(r);carry=null}else if((carry+l).length<200)carry=carry+" "+l.trim();else carry=null;continue}
+    if(!isRow){if(out.length&&/[a-z]/i.test(l)&&!STOP.test(l)&&l.trim().length<70)pend.push(l.trim());continue}
+    if(out.length&&pend.length){out[out.length-1].description=(out[out.length-1].description+" "+pend.join(" ")).trim()}pend=[];carry=null;
+    const r=tryRow(l);if(r)out.push(r);else carry=l.trim()}
+  return {poNo,poDate,customer,shipMode,lines:out};
+}
+/* barang terbuka yang part number-nya tertulis di teks PO (tahan salah baca OCR O/0, I/1, S/5, B/8) */
+const ocrKey=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/O/g,"0").replace(/[IL]/g,"1").replace(/S/g,"5").replace(/B/g,"8").replace(/Z/g,"2");
+function pnScan(text,items,have){const T=ocrKey(text);const lines=String(text||"").split(/\r?\n/);const res=[];
+  for(const it of items){if(have.has(it.id)||!it.part)continue;const k=ocrKey(it.part);if(k.length<5||!T.includes(k))continue;
+    let qty=0;const ln=lines.find(l=>ocrKey(l).includes(k));if(ln){const m=ln.match(new RegExp("\\b(\\d{1,4})\\s*("+RULE_UNITS+")\\b","i"))||ln.match(new RegExp("\\b("+RULE_UNITS+")\\s+(\\d{1,4})\\b","i"));if(m)qty=Number(/^\d/.test(m[1])?m[1]:m[2])||0}
+    res.push({partNumber:it.part,description:it.desc||"",qty:qty||Number(it.qty)||0,unit:it.unit||"",unitPrice:0,itemId:it.id,found:true})}
+  return res}
 function matchLine(line,cands){const k=looseKey(line.partNumber||"");
   let hit=k?cands.find(i=>i.part&&looseKey(i.part)===k):null;
   if(!hit&&k&&k.length>=5)hit=cands.find(i=>i.part&&(looseKey(i.part).includes(k)||k.includes(looseKey(i.part))));
@@ -1576,7 +1619,7 @@ function matchOpt(it,price,shipMode){const os=(it?.sellOpts||[]);const cand=[];o
 function openCpoUpload(pre={}){
   if(!canW())return;const custs=[...new Set(Object.values(S.rfqs).map(r=>r.customer).filter(Boolean))].sort();
   let file=null,lines=[],qid=pre.quoteId||"",cust=pre.customer||(pre.quoteId?(S.quotes[pre.quoteId]?.d?.name||""):"")||(pre.rfqId?S.rfqs[pre.rfqId]?.customer:"")||"";
-  let head={poNo:"",poDate:today(),shipMode:""};let lostOn=false;
+  let head={poNo:"",poDate:today(),shipMode:""};let lostOn=false;S.cpoHow="";
   const openItems=()=>S.items.filter(i=>!["tiba","batal"].includes(i.status));
   const quoteList=()=>Object.values(S.quotes||{}).filter(q=>q.d&&["approved","pending"].includes(qStatus(q))).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
   const optOf=(it,g,m)=>{const o=(it?.sellOpts||[]).find(x=>x.g===g);return o?Number(m==="udara"?o.d:o.l)||0:0};
@@ -1597,7 +1640,7 @@ function openCpoUpload(pre={}){
     const ql=quoteList();
     $("#cp_body").innerHTML=`<div class="cp-src">
       <label class="cp-card cp-drop" id="cp_drop"><input type="file" id="cp_file" accept="application/pdf,image/*" hidden>
-        <span class="cp-ic">📄</span><b>Upload file PO</b><span class="sub">${S.sample?"Tarik file PDF/foto ke sini atau klik. AI langsung membaca No. PO, customer, dan barangnya, lalu mencocokkan dengan quotation.":"Pembacaan AI tidak tersedia di tampilan ini. File tetap tersimpan; pilih barangnya dari quotation di sebelah."}</span>
+        <span class="cp-ic">📄</span><b>Upload file PO</b><span class="sub">${S.sample?"Tarik file PDF/foto ke sini atau klik. No. PO, customer, dan barangnya dibaca otomatis (dengan AI bila aktif, atau tanpa AI/OCR), lalu dicocokkan dengan quotation.":"Tarik file PDF/foto ke sini atau klik. Dibaca tanpa AI (teks PDF / OCR), lalu dicocokkan dengan quotation."}</span>
         <span class="sub" id="cp_msg"></span></label>
       <div class="cp-card cp-pick"><span class="cp-ic">☑</span><b>Pilih dari quotation</b><span class="sub">Centang barang yang di-PO, isi nomor PO. Cocok bila PO hanya dikirim lewat WA/email.</span>
         <input id="cp_qs" placeholder="Cari customer / no. quotation…" style="margin-top:6px">
@@ -1611,12 +1654,16 @@ function openCpoUpload(pre={}){
     drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");const f=[...e.dataTransfer.files].find(x=>/pdf|image/.test(x.type));if(f)gotFile(f)});
     $("#cp_file").onchange=e=>{const f=e.target.files[0];if(f)gotFile(f)};
     $("#cp_foot").innerHTML=`<button type="button" data-close="1">Batal</button>`};
-  const gotFile=async f=>{file=f;if(!S.sample){msg(`<b>${esc(f.name)}</b> siap disimpan. Pilih quotation di sebelah kanan untuk mencentang barangnya.`);return}
+  const gotFile=async f=>{file=f;
     msg(`<span class="spin"></span> Membaca <b>${esc(f.name)}</b>…`);
-    try{const txt=await readDocText(f,t=>msg(`<span class="spin"></span> ${esc(t)}`));if(txt.replace(/\s/g,"").length<30){msg("Teks PO tidak terbaca. Pilih barang dari quotation di sebelah kanan.");return}
-      msg(`<span class="spin"></span> AI membaca isi PO…`);const r=await askJson(CPO_PROMPT+"\n\nTEKS PO:\n"+txt.slice(0,40000),{});
+    try{const txt=await readDocText(f,t=>msg(`<span class="spin"></span> ${esc(t)}`));if(txt.replace(/\s/g,"").length<30){msg("Teks PO tidak terbaca (foto/scan kurang jelas). Pilih barang dari quotation di sebelah kanan.");return}
+      let r=null,how="";
+      if(S.sample&&!S.noAI&&!noAiPref){msg(`<span class="spin"></span> AI membaca isi PO…`);
+        try{r=await askJson(CPO_PROMPT+"\n\nTEKS PO:\n"+txt.slice(0,40000),{})}catch(e){if(e?.code==="no_key"||/credit|billing|api[_ ]key/i.test(e?.message||""))S.noAI=true;diag("cpo-ai-fail",errInfo(e));how=aiErr(e).split(". ")[0]+". "}}
+      if(!r){r=ruleParsePo(txt);how+="Dibaca tanpa AI. ";diag("cpo-rules",{n:r.lines.length,po:!!r.poNo})}
       head={poNo:String(r?.poNo||""),poDate:/^\d{4}-\d{2}-\d{2}$/.test(r?.poDate||"")?r.poDate:today(),shipMode:/udara|air/i.test(r?.shipMode||"")?"udara":/laut|sea/i.test(r?.shipMode||"")?"laut":""};
       const raw=(r?.lines||[]).filter(x=>x&&(x.partNumber||x.description)).map(x=>({inc:true,partNumber:String(x.partNumber||""),description:String(x.description||""),unit:String(x.unit||""),qty:Number(x.qty)||0,unitPrice:Number(x.unitPrice)||0}));
+      S.cpoHow=how;S.cpoTxt=txt;
       // 1) cocokkan ke semua barang terbuka, 2) tentukan customer, 3) cocokkan ulang khusus customer itu, 4) tebak quotation
       let C=openItems();raw.forEach(l=>{const it=matchLine(l,C);l.itemId=it?it.id:""});
       const votes={};raw.forEach(l=>{const c=S.rfqs[S.items.find(i=>i.id===l.itemId)?.rfqId]?.customer;if(c)votes[c]=(votes[c]||0)+1});
@@ -1624,6 +1671,10 @@ function openCpoUpload(pre={}){
       if(!c&&r?.customer){const rc=String(r.customer).toLowerCase();c=custs.find(x=>{const xl=x.toLowerCase();return rc.includes(xl.replace(/\s*\(.*\)/,""))||xl.includes(rc.slice(0,6))})||String(r.customer)}
       cust=c||cust;
       if(cust){C=openItems().filter(i=>S.rfqs[i.rfqId]?.customer===cust);if(C.length)raw.forEach(l=>{const it=matchLine(l,C);l.itemId=it?it.id:""})}
+      {const have=new Set(raw.map(l=>l.itemId).filter(Boolean));const pool=cust?openItems().filter(i=>S.rfqs[i.rfqId]?.customer===cust):openItems();
+        const extra=pnScan(txt,pool,have).filter(x=>!raw.some(l=>looseKey(l.partNumber)&&looseKey(l.partNumber)===looseKey(x.partNumber)));
+        if(extra.length){raw.push(...extra.map(x=>({...x,inc:true})));if(!cust){const v={};extra.forEach(x=>{const c=S.rfqs[S.items.find(i=>i.id===x.itemId)?.rfqId]?.customer;if(c)v[c]=(v[c]||0)+1});cust=Object.entries(v).sort((a,b)=>b[1]-a[1])[0]?.[0]||cust}}
+        if(!cust&&r?.customer)cust=String(r.customer)}
       const ids=new Set(raw.map(l=>l.itemId).filter(Boolean));let best=null,bs=0;
       quoteList().forEach(q=>{const qi=new Set((q.d.rows||[]).map(r=>r.id));const sc=[...ids].filter(x=>qi.has(x)).length;if(sc>bs){bs=sc;best=q}});qid=best?best.id:"";
       raw.forEach(l=>{const it=S.items.find(i=>i.id===l.itemId);const o=matchOpt(it,l.unitPrice,head.shipMode);l.g=o.g||guessGrade(l.description);l.m=o.m;l.warn=o.diff>.03});
@@ -1638,7 +1689,7 @@ function openCpoUpload(pre={}){
     const draw=()=>{const inc=lines.filter(l=>l.inc);const tot=inc.reduce((s,l)=>s+(Number(l.unitPrice)||0)*(Number(l.qty)||0),0);
       const nNew=inc.filter(l=>!l.itemId).length,nOut=lines.filter(l=>!l.inc&&l.itemId).length;
       const allItems=cust?openItems().filter(i=>S.rfqs[i.rfqId]?.customer===cust):openItems();
-      $("#cp_body").innerHTML=`<div class="cp-head">
+      $("#cp_body").innerHTML=`${file&&S.cpoHow?`<div class="dupnote">${esc(S.cpoHow)}Periksa No. PO, qty dan harga, serta centang barang yang benar sebelum menyimpan.</div>`:""}<div class="cp-head">
          <label class="f">Customer *<input id="cp_cust" list="dlCpoCust" value="${esc(cust)}"></label>
          <label class="f">No. PO customer *<input id="cp_no" value="${esc(head.poNo)}" placeholder="mis. PO/WTL/2026/0912" class="${head.poNo?"":"chk"}"></label>
          <label class="f">Tanggal PO<input type="date" id="cp_date" value="${esc(head.poDate||today())}"></label>
@@ -2655,8 +2706,8 @@ function rulePart(desc){
   const d=(desc.slice(0,c.i)+desc.slice(c.i+c.raw.length)).replace(/\bP\/?N\b[:.]?/i,"").replace(/[,(\s]+$/,"").replace(/\(\s*\)/g,"").replace(/\s{2,}/g," ").trim();
   return {part:c.pn,desc:d||desc.trim()};
 }
-function ruleParseRfq(text,fallbackNo){
-  const lines=String(text||"").split(/\r?\n/).map(l=>l.replace(/ /g," ").replace(/\s*\|\|.*$/,"").replace(/\s+$/,"")).filter(l=>l.trim());
+function ruleParseRfq(text,fallbackNo,ocr){
+  const lines=String(text||"").split(/\r?\n/).map(l=>l.replace(/ /g," ").replace(/\s*\|\|.*$/,"").replace(/\s*[|¦]\s*/g,"  ").replace(/^(\s*\d{1,3})\s*[,;:]\s+/,"$1 ").replace(/\s+$/,"")).filter(l=>l.trim());
   let customer="",docNo="",date="";
   for(const l of lines.slice(0,15)){
     if(!customer){const m=l.match(/\b(PT\.?\s*[A-Z][\w.&,\s-]{2,60}?|CV\.?\s*[A-Z][\w.&,\s-]{2,60}?)(?=\s{2,}|\s*\(|$)/);if(m)customer=m[1].replace(/\s+/g," ").trim()}
@@ -2683,6 +2734,17 @@ function ruleParseRfq(text,fallbackNo){
     items.push({no,part:p.part,desc:p.desc,qty:Number(String(qty).replace(",","."))||1,unit:unit.toUpperCase().replace(/^PC$/,"PCS")});
   }
   if(pending.length&&items.length){const last=items[items.length-1];if(pending.join(" ").length<60)last.desc=(last.desc+" "+pending.join(" ")).trim()}
+  { // cadangan longgar (OCR tabel berantakan): baris yang memuat part number; dipakai bila menangkap lebih banyak
+    const loose=[];
+    const QU1=new RegExp("(?:^|\\s)(\\d{1,4})\\s*("+RULE_UNITS+")\\b","i"),QU2=new RegExp("\\b("+RULE_UNITS+")\\s+(\\d{1,4})(?![\\w\\/-])","i");
+    for(const l0 of lines){const l=l0.replace(/[|¦_]/g," ").replace(/\s{2,}/g," ").trim();if(l.length<6||/(total|ppn|tanggal|date|page|halaman|telp|phone|fax|email|alamat|address)/i.test(l))continue;
+      const body=l.replace(/^\d{1,3}[.)]?\s+/,"");let qty=1,unit="PCS",rest=body;const q1=body.match(QU1);const q2=q1?null:body.match(QU2);
+      if(q1){qty=Number(q1[1])||1;unit=q1[2].toUpperCase().replace(/^PC$/,"PCS");rest=body.slice(0,q1.index)+" "+body.slice(q1.index+q1[0].length)}
+      else if(q2&&!/^\d/.test(body.slice(q2.index+q2[0].length).trim())&&/\s\S+\s/.test(body.slice(0,q2.index)+" ")&&rulePart(body.slice(0,q2.index)).part){qty=Number(q2[2])||1;unit=q2[1].toUpperCase().replace(/^PC$/,"PCS");rest=body.slice(0,q2.index)+" "+body.slice(q2.index+q2[0].length)}
+      else{const t=body.match(/\s(\d{1,3})\s*$/);if(t&&rulePart(body.slice(0,t.index)).part){qty=Number(t[1])||1;rest=body.slice(0,t.index)}}
+      const p=rulePart(rest);if(!p.part||!/[a-z]{3}/i.test(p.desc))continue;
+      loose.push({no:"",part:p.part,desc:p.desc.replace(/^[\s,.;:-]+|[\s,.;:-]+$/g,"").replace(/\b(qty|jumlah)\b[:.]?/ig,"").replace(/\s{2,}/g," ").trim(),qty,unit,check:true})}
+    const withPn=items.filter(i=>i.part).length;if(ocr?loose.length>withPn:!items.length){items.length=0;items.push(...loose)}}
   const groups=new Map();
   for(const it of items){const k=it.no||docNo||fallbackNo||"";if(!groups.has(k))groups.set(k,[]);groups.get(k).push(it)}
   return [...groups.entries()].map(([k,its])=>({rfqNo:k,date,customer,items:its.map(({no,...x})=>({...x,unitAlat:""}))}));
@@ -2696,9 +2758,9 @@ async function readFileRules(f,src,why){
     for(let n=1;n<=total;n++){if(signal.aborted)break;
       let t=src.textOnly?(src.texts[n-1]||""):src.pdf?await pdfPageText(src.pdf,n):"";
       if(t.replace(/\s/g,"").length<=80){msg(`Membaca halaman ${n} dari ${total} dengan OCR (tanpa AI, ± 15–30 detik)…`);ocrPages++;
-        try{const o=await ocrCanvas(await src.get(n),signal);t=o.text}catch(e){if(e?.code==="cancelled"||signal.aborted)break;t=""}}
-      else msg(`Membaca teks halaman ${n} dari ${total}…`);
-      docs.push(...ruleParseRfq(t,total>1?"":base))}
+        try{const o=await ocrCanvas(await src.get(n),signal);t=o.text}catch(e){if(e?.code==="cancelled"||signal.aborted)break;diag("ocr-fail",errInfo(e));t=""}
+        docs.push(...ruleParseRfq(t,total>1?"":base,true))}
+      else{msg(`Membaca teks halaman ${n} dari ${total}…`);docs.push(...ruleParseRfq(t,total>1?"":base))}}
   }finally{aiCtl=null;if($("#aiStop"))$("#aiStop").hidden=true}
   if(!$("#prev"))return;
   const custs=[...new Set(docs.map(d=>d.customer).filter(Boolean))];if(custs.length===1)docs.forEach(d=>{if(!d.customer)d.customer=custs[0]});
