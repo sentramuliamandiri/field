@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124135507"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124140322"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -137,6 +137,7 @@
 .qsup{border:1px solid var(--line,#dde3ea);border-radius:10px;padding:8px 12px;margin-bottom:12px}.qsup summary{cursor:pointer;padding:4px 0}.qsup .tbl-wrap{margin-top:8px}
 .nstag{display:inline-block;font-weight:700;font-size:12px;letter-spacing:.02em;color:var(--s-batal,#b0413a);border:1px solid currentColor;border-radius:6px;padding:2px 8px}.on-ns{color:var(--s-batal,#b0413a)!important;font-weight:700}.pp-tbl td.ns{font-weight:700}
 .qt td:last-child{white-space:normal}.qt td:last-child .sm{display:block;width:100%;text-align:left;padding:3px 6px;min-height:28px}
+.pcell>.nstag{align-self:flex-start;width:auto;flex:none}
 </style></head><body>
 <title>Tracking Pengadaan SMM</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -712,10 +713,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124135507">
-<script src="config.js?v=20261124135507"></script>
+<link rel="stylesheet" href="supa.css?v=20261124140322">
+<script src="config.js?v=20261124140322"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124135507"></script>
+<script src="supa.js?v=20261124140322"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1098,9 +1099,10 @@ const QMODE_LBL={l:"Laut",u:"Udara",lu:"Laut & Udara"};
 const lastQMode=()=>{try{const m=localStorage.getItem("smm_qmode");if(["l","u","lu"].includes(m))return m}catch{}return "l"};
 const modeRows=(rows,m)=>m==="l"?rows.map(r=>({...r,d:"",price:r.l,total:(Number(r.l)||0)*(Number(r.qty)||0)})):m==="u"?rows.map(r=>({...r,l:"",price:r.d,total:(Number(r.d)||0)*(Number(r.qty)||0)})):rows;
 const rowGrade=r=>r.g!=null&&r.g!==""?normGrade(r.g):normGrade(r.brand);
-function quoteRowsFor(i){const base={id:i.id,inc:true,group:i.unitAlat||"",desc:[i.desc,i.part].filter(Boolean).join(" "),qty:Number(i.qty)||0,unit:i.unit||"PCS"};
+function quoteRowsFor(i){return quoteRowsFor0(i).map(r=>nsOf(i,r.g)?{...r,ns:true,d:"",l:""}:r)}
+function quoteRowsFor0(i){const base={id:i.id,inc:true,group:i.unitAlat||"",desc:[i.desc,i.part].filter(Boolean).join(" "),qty:Number(i.qty)||0,unit:i.unit||"PCS"};
   const o=i.sellOpts||[];if(o.length)return o.map(x=>({...base,g:x.g,d:x.d,l:x.l,brand:x.g||i.brand||"",cost:costFor(i,x.g)}));
-  const gs=[...new Set(quotesOf(i).map(q=>q.grade).filter(Boolean))];if(gs.length)return gs.map(g=>({...base,g,d:"",l:"",brand:g,cost:costFor(i,g)}));
+  const gs=[...new Set([...quotesOf(i).map(q=>q.grade),...nsGrades(i)].filter(Boolean))];if(gs.length)return sortG(gs).map(g=>({...base,g,d:"",l:"",brand:g,cost:costFor(i,g)}));
   return [{...base,g:normGrade(i.brand),d:"",l:"",brand:i.brand||"",cost:Number(i.price)>0?Number(i.price):""}]}
 async function saveOptsFromRows(rows){const by={};rows.forEach(r=>{if(r.d===""&&r.l==="")return;(by[r.id]=by[r.id]||[]).push({g:rowGrade(r),d:r.d,l:r.l})});
   const want={};for(const [id,nw] of Object.entries(by)){const it=S.items.find(x=>x.id===id);if(!it)continue;const m=mergeOpts(it.sellOpts||[],nw);if(JSON.stringify(m)!==JSON.stringify(it.sellOpts||[]))want[id]=m}
@@ -1146,7 +1148,7 @@ function openQuote(ids,qid){
   if(eq){const d=qData(eq);for(const k of ["no","date","name","address","country","phone","attn","cc","priceTerms","deliveryTime","validityQ","paymentTerms","vat","signer"])if($("#q_"+k)&&d[k]!=null)$("#q_"+k).value=d[k];
     $("#q_rfqref").value=d.rfqRef||"";$("#q_rfqdate").value=d.rfqDate||"";if(d.fl!==undefined)$("#q_fl").value=Number(d.fl)>0?fmtN(d.fl):"";if(d.fu!==undefined)$("#q_fu").value=Number(d.fu)>0?fmtN(d.fu):"";$("#q_sig").checked=d.sig!==false;
     Q.mode=["l","u","lu"].includes(d.mode)?d.mode:"lu";
-    Q.rows=(d.rows||[]).map(r=>{const it=S.items.find(x=>x.id===r.id);return {...r,...rowDL(r),g:rowGrade(r),inc:true,cost:it?costFor(it,rowGrade(r)):""}});Q.rfqIds=eq.rfqIds||Q.rfqIds;$("#q_tbl").innerHTML="";renderQuoteTbl();
+    Q.rows=(d.rows||[]).map(r=>{const it=S.items.find(x=>x.id===r.id);const ns=it?nsOf(it,rowGrade(r)):!!r.ns;const x={...r,...rowDL(r),g:rowGrade(r),inc:true,cost:it?costFor(it,rowGrade(r)):""};if(ns){x.ns=true;x.d="";x.l=""}else delete x.ns;return x});Q.rfqIds=eq.rfqIds||Q.rfqIds;$("#q_tbl").innerHTML="";renderQuoteTbl();
     if(qStatus(eq)==="approved")$("#q_warn").insertAdjacentHTML("beforebegin",`<div class="dupnote">Quotation ini sudah disetujui. Setelah diubah, quotation ${S.isApprover?"langsung disetujui ulang atas nama Anda":"dikirim ulang ke pimpinan untuk disetujui"}. PDF/Excel versi lama tidak berlaku lagi.</div>`);
     const a=(S.approvals||{})[qid];if(a&&a.status==="revision"&&a.submittedAt===eq.submittedAt)$("#q_warn").insertAdjacentHTML("beforebegin",`<div class="dupnote">Catatan revisi dari pimpinan: “${esc(a.note)}”</div>`)}
   ["q_fl","q_fu"].forEach(i=>{rpInput($("#"+i));$("#"+i).addEventListener("input",frInfo)});
@@ -1177,27 +1179,17 @@ function renderQuoteTbl(){if(!$("#q_tbl"))return;syncQuote();
      <td><input data-qi="${r.i}" data-qf="desc" value="${esc(r.desc)}" style="width:100%">${c>0?`<div class="sub">modal ${esc(r.g||"")} ${rp(c)}</div>`:""}</td>
      <td class="num"><input class="pin" style="width:56px" data-qi="${r.i}" data-qf="qty" value="${r.qty}"></td>
      <td><input data-qi="${r.i}" data-qf="unit" value="${esc(r.unit)}" style="width:56px"></td>
-     ${r.ns?`<td class="num" colspan="${M==="lu"?2:1}"><span class="nstag">NO STOCK</span></td>`:""}
+     ${r.ns?`<td class="num" colspan="${M==="lu"?2:1}"><span class="nstag" title="Diatur di harga supplier (RFQ)">NO STOCK</span></td>`:""}
      ${!r.ns&&M!=="u"?`<td class="num"><input class="pin ${miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="l" value="${r.l===""?"":fmtEn(r.l)}" placeholder="${S.isApprover?"laut":"pimpinan"}" ${dis}>${low(r.l)}${it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
      ${!r.ns&&M!=="l"?`<td class="num"><input class="pin ${M==="u"&&miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="d" value="${r.d===""?"":fmtEn(r.d)}" placeholder="${S.isApprover?"udara":"pimpinan"}" ${dis}>${low(r.d)}${M==="u"&&it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
      <td><input class="${noB?"chk":""}" data-qi="${r.i}" data-qf="brand" list="dlGrade" value="${esc(r.brand)}" placeholder="OEM" style="width:100%"></td>
-     <td><button type="button" class="ghost sm" data-qdup="${r.i}" title="Tambah baris jenis lain untuk part ini">+ jenis</button><button type="button" class="ghost sm ${r.ns?"on-ns":""}" data-qns="${r.i}" title="Tandai barang ini tidak ada stok (ditulis NO STOCK di quotation)">${r.ns?"✓ No stock":"No stock"}</button>${it?`<button type="button" class="ghost sm" data-qsup="${esc(r.id)}" title="Lihat / ubah harga supplier part ini">Harga supplier</button>`:""}</td></tr>`}).join("")}).join("")}
+     <td><button type="button" class="ghost sm" data-qdup="${r.i}" title="Tambah baris jenis lain untuk part ini">+ jenis</button></td></tr>`}).join("")}).join("")}
   </tbody></table></div>${gradeDL()}`;
   const inc=modeRows(Q.rows.filter(r=>r.inc),M);const tot=inc.reduce((s,r)=>s+(Number(rowPrimary(r))||0)*(Number(r.qty)||0),0);const miss=inc.filter(r=>!r.ns&&(M==="l"?r.l==="":M==="u"?r.d==="":(r.d===""&&r.l===""))).length;
   const dupB=Object.entries(cnt).filter(([id,n])=>n>1).some(([id])=>{const bs=inc.filter(r=>r.id===id).map(r=>normGrade(r.brand));return bs.some(b=>!b)||new Set(bs).size<bs.length});
   $("#q_warn").innerHTML=(miss?`<span class="late-tag">${miss} baris belum ada harga</span> `:"")+(dupB?`<span class="late-tag">Part dengan beberapa baris wajib punya Brand/jenis berbeda</span>`:"");
   $("#q_sum").innerHTML=`${inc.length} baris · Total ${M==="u"?"udara":"laut"} <b>Rp ${fmtEn(tot)}</b>${M==="lu"?` <span class="sub">(tidak dicetak)</span>`:""}`;
   document.querySelectorAll("#q_tbl [data-qi]").forEach(el=>el.addEventListener("change",renderQuoteTbl));
-  document.querySelectorAll("#q_tbl [data-qns]").forEach(b=>b.onclick=()=>{syncQuote();const r=Q.rows[+b.dataset.qns];if(!r)return;r.ns=!r.ns;if(r.ns){r.inc=true}$("#q_tbl").innerHTML="";renderQuoteTbl()});
-  document.querySelectorAll("#q_tbl [data-qsup]").forEach(b=>b.onclick=()=>{syncQuote();const id=b.dataset.qsup;
-    S.onO2Close=()=>{if(!$("#q_tbl"))return;const it=S.items.find(x=>x.id===id);if(!it)return;
-      Q.rows.forEach(r=>{if(r.id!==id)return;const g=rowGrade(r);r.cost=costFor(it,g)??"";const o=(it.sellOpts||[]).find(x=>x.g===g);if(o){if(r.l===""&&o.l!=="")r.l=o.l;if(r.d===""&&o.d!=="")r.d=o.d}});
-      const have=new Set(Q.rows.filter(r=>r.id===id).map(r=>rowGrade(r)));const base=Q.rows.find(r=>r.id===id)||quoteRowsFor(it)[0];
-      const gsNew=[...new Set([...quotesOf(it).map(q=>q.grade),...(it.sellOpts||[]).map(o=>o.g)])].filter(g=>g&&!have.has(g));
-      const extra=sortG(gsNew).map(g=>{const o=(it.sellOpts||[]).find(x=>x.g===g);return {...base,g,brand:g,d:o?o.d:"",l:o?o.l:"",cost:costFor(it,g)??""}});
-      if(extra.length){const last=Q.rows.map(r=>r.id).lastIndexOf(id);Q.rows.splice(last+1,0,...extra.map(x=>({...x,inc:false})));toast(`Jenis baru ${extra.map(x=>x.g).join(", ")} ditambahkan (belum dicentang).`)}
-      $("#q_tbl").innerHTML="";renderQuoteTbl()};
-    openPriceEditor([id],{stack:true})});
   document.querySelectorAll("#q_tbl [data-qdup]").forEach(b=>b.onclick=()=>{syncQuote();const k=+b.dataset.qdup;const r=Q.rows[k];Q.rows.splice(k+1,0,{...r,inc:true,g:"",brand:"",d:"",l:"",cost:""});$("#q_tbl").innerHTML="";renderQuoteTbl();
     const el=document.querySelector(`#q_tbl [data-qi="${k+1}"][data-qf="brand"]`);if(el)el.focus()});
 }
@@ -1412,6 +1404,7 @@ async function setSellOpts(ids,optsFor){
 async function addSupplierQuote(ids,{name,grade,price,stock,note}){
   const key=supKey(name)+"__"+gradeKey(grade);const val={name,grade:normGrade(grade),price:Number(price),stock:stock||"",note:note||"",at:today(),del:false};
   for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const it=S.items.find(x=>x.id===id)||{};const p={quotes:{[key]:val}};
+    if(it.noStock&&(it.noStock[val.grade]||it.noStock["*"]))p.noStock={[val.grade]:false,"*":false};
     Object.entries(it.quotes||{}).forEach(([k,q])=>{if(k!==key&&q&&!q.del&&supKey(q.name||"")===supKey(name)&&normGrade(q.grade)===val.grade)p.quotes[k]={del:true}});
     const cur=Number(it.price);const old=(it.quotes||{})[key];if(!(cur>0)||val.price<=cur||(old&&!old.del&&it.supplier===name&&Number(old.price)===cur)){p.price=val.price;p.supplier=name;if(!it.source)p.source="supplier"}
     return S.db.doc("items/"+id).update(stamp(p))}));
@@ -1424,17 +1417,21 @@ const GCOL={OEM:"--s-cari",GENUINE:"--s-tiba",ORIGINAL:"--s-beli",THAILAND:"--s-
 const gradePill=g=>{const k=normGrade(g);return `<span class="gp" style="--c:var(${GCOL[k]||(k?"--s-tawar":"--s-batal")})">${esc(k||"?")}</span>`};
 const gOrder=g=>{const i=GRADES.indexOf(g);return i<0?(g?50:99):i};
 const sortG=a=>[...a].sort((x,y)=>gOrder(x)-gOrder(y)||x.localeCompare(y));
-function gradesOf(it){return sortG([...new Set([...quotesOf(it).map(q=>q.grade),...(it.sellOpts||[]).map(o=>o.g)])])}
+const nsGrades=it=>Object.entries(it?.noStock||{}).filter(([g,v])=>v&&g!=="*").map(([g])=>g);
+const nsOf=(it,g)=>{const m=it?.noStock||{};return !!(m["*"]||m[normGrade(g)])};
+function gradesOf(it){return sortG([...new Set([...quotesOf(it).map(q=>q.grade),...(it.sellOpts||[]).map(o=>o.g),...nsGrades(it)])])}
 function priceCells(key,its){GMAP[key]=its.map(i=>i.id);const f=its[0]||{};
   const sig=it=>JSON.stringify([quotesOf(it).map(q=>[q.grade,q.price,q.name]),it.sellOpts||[]]);const same=its.every(i=>sig(i)===sig(f));
   const multi=its.length>1?`<div class="pc-n">${its.length} item</div>`:"";
   if(!same)return `<td data-nb="1" class="pc" colspan="2"><button type="button" class="pcell" data-pe="${esc(key)}"><span class="sub">Harga berbeda antar item · klik untuk melihat</span></button></td>`;
   const qs=quotesOf(f),opts=f.sellOpts||[];let gs=gradesOf(f);
   const legacy=!qs.length&&Number(f.price)>0;if(legacy&&!gs.includes(""))gs=[...gs,""];
+  if(!gs.length&&nsOf(f,"*")){return `<td data-nb="1" class="pc"><button type="button" class="pcell" data-pe="${esc(key)}"><span class="nstag">NO STOCK</span></button>${multi}</td>
+    <td data-nb="1" class="pc"><button type="button" class="pcell empty" data-pe="${esc(key)}">—</button></td>`}
   if(!gs.length){return `<td data-nb="1" class="pc"><button type="button" class="pcell empty" data-pe="${esc(key)}">${canW()?"+ isi":"—"}</button></td>
     <td data-nb="1" class="pc"><button type="button" class="pcell empty" data-pe="${esc(key)}">${S.isApprover&&canW()?"+ isi":"—"}</button>${lastLine(its)}</td>`}
   const supRows=gs.map(g=>{const m=qs.filter(q=>q.grade===g);if(!m.length&&g===""&&legacy)return `<div class="pl">${gradePill("")}<b>${fmtN(f.price)}</b><span class="sn">${esc(f.supplier||"")}</span></div>`;
-    if(!m.length)return `<div class="pl">${gradePill(g)}<span class="sub">—</span></div>`;
+    if(!m.length)return `<div class="pl">${gradePill(g)}${nsOf(f,g)?`<span class="nstag">NO STOCK</span>`:`<span class="sub">—</span>`}</div>`;
     const b=m.reduce((a,c)=>c.price<a.price?c:a);return `<div class="pl">${gradePill(g)}<b>${fmtN(b.price)}</b><span class="sn" title="${esc(m.map(x=>x.name+" "+fmtN(x.price)).join(" · "))}">${esc(b.name)}${m.length>1?` +${m.length-1}`:""}</span></div>`}).join("");
   const offRows=gs.map(g=>{const o=opts.find(x=>x.g===g);const md=o&&o.l===""?"d":"l";const c=costMode(f,g,md);
     const cell=(v,lbl)=>`<span class="pv ${v===""||v==null?"no":""}"><i>${lbl}</i>${v===""||v==null?"—":fmtN(v)}</span>`;
@@ -1459,6 +1456,9 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
   const O=new Map();(f.sellOpts||[]).forEach(o=>O.set(o.g,{d:o.d,l:o.l}));
   const hasQ=g=>[...qmap.values()].some(q=>q.grade===g);
   const offerGrades=()=>sortG([...new Set([...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()])]);
+  const setNS=async(g,on)=>{const p={noStock:{[g]:on}};if(on&&g==="*")[...NS.keys()].forEach(k=>p.noStock[k]=k==="*");
+    for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>S.db.doc("items/"+id).update(stamp(p))));
+    its.forEach(it=>{it.noStock={...(it.noStock||{}),...p.noStock}});NS.clear();Object.entries(f.noStock||{}).filter(([k,v])=>v).forEach(([k])=>NS.set(k,true))};
   let pick="",editKey=null;
   const lo=f.part?partOcc(f.part).filter(o=>!ids.includes(o.id)).find(o=>o.offered!=null):null;
   const units=[...new Set(its.map(i=>i.unitAlat).filter(Boolean))];
@@ -1475,7 +1475,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
         <label class="f">Harga satuan<span class="rpw"><span>Rp</span><input id="pe_p" inputmode="numeric" placeholder="0"></span></label>
         <label class="f">Stok<select id="pe_st"><option value="">—</option><option>ready</option><option>indent</option><option>kosong</option></select></label>
         <label class="f">Catatan<input id="pe_n" placeholder="opsional: merek, lead time"></label>
-        <button type="button" class="ink" id="pe_add">Simpan harga</button></div>
+        <button type="button" class="ink" id="pe_add">Simpan harga</button><button type="button" class="ghost" id="pe_ns" title="Tidak ada stok untuk jenis yang dipilih (atau semua jenis bila jenis belum dipilih). Di quotation ditulis NO STOCK.">No stock</button></div>
        <div class="sub" id="pe_hint"></div></div>`:""}
     </section>
     <section class="pe-step"><div class="pe-h"><span class="pe-num">2</span><div><b>Harga tawar ke customer</b><div class="sub">${canSell?"Isi harga laut dan/atau udara per jenis. Klik ✕ untuk menghapus harga tawar suatu jenis.":"Diisi oleh pimpinan. Anda hanya bisa melihat."}</div></div></div>
@@ -1489,7 +1489,10 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
     <datalist id="dlSupPe">${supList.map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
    </div>
    <div class="df"><span class="sub" id="pe_msg" style="margin-right:auto"></span><button type="button" data-close="1">${canSell?"Batal":"Tutup"}</button>${canSell?`<button type="button" class="primary" id="pe_save">Simpan harga tawar</button>`:""}</div></div></div>`;
-  const drawQ=()=>{const qs=[...qmap.values()].sort((a,b)=>gOrder(a.grade)-gOrder(b.grade)||a.price-b.price);
+  const NS=new Map(Object.entries(f.noStock||{}).filter(([g,v])=>v));
+  const nsList=()=>NS.size?`<div class="pe-list pe-ns">${[...NS.keys()].sort((a,b)=>gOrder(a)-gOrder(b)).map(g=>`<div class="pe-it">${g==="*"?`<span class="gp" style="--c:var(--s-batal)">SEMUA JENIS</span>`:gradePill(g)}<div class="pe-sup"><span class="nstag">NO STOCK</span><span class="sub">Di quotation ditulis NO STOCK</span></div><div class="pe-pr"></div><div class="pe-act">${canQ?`<button type="button" class="ghost sm danger" data-pensdel="${esc(g)}" aria-label="Hapus tanda no stock">✕</button>`:""}</div></div>`).join("")}</div>`:"";
+  const drawQ=()=>{drawQ0();if(NS.size)$("#pe_q").insertAdjacentHTML("beforeend",nsList())};
+  const drawQ0=()=>{const qs=[...qmap.values()].sort((a,b)=>gOrder(a.grade)-gOrder(b.grade)||a.price-b.price);
     const legacy=!qs.length&&Number(f.price)>0;
     $("#pe_q").innerHTML=qs.length?`<div class="pe-list">${qs.map(q=>{const used=its.every(it=>it.supplier===q.name&&Number(it.price)===q.price);
       return `<div class="pe-it ${used?"used":""}">${gradePill(q.grade)}<div class="pe-sup"><b>${esc(q.name)}</b><span class="sub">${esc([q.stock,q.note,fmtD(q.at)].filter(Boolean).join(" · "))}</span></div><div class="pe-pr">${rp(q.price)}</div>
@@ -1518,7 +1521,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
       if(!g){hint("Pilih jenis barang dulu (OEM, GENUINE, …)");return}if(!name){hint("Isi nama supplier");$("#pe_sup").focus();return}if(!(p>0)){hint("Isi harga satuan");$("#pe_p").focus();return}
       const b=$("#pe_add");b.disabled=true;
       try{const st=$("#pe_st").value,nt=$("#pe_n").value.trim();const old=editKey?qmap.get(editKey):null;const key=await addSupplierQuote(ids,{name,grade:g,price:p,stock:st,note:nt});
-        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today()};
+        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today()};if(NS.has(g)||NS.has("*")){NS.delete(g);NS.delete("*");its.forEach(it=>{it.noStock={...(it.noStock||{}),[g]:false,"*":false}})}
         let moved="";
         if(old&&old.key!==key){await removeSupplierQuote(ids,old.key);qmap.delete(old.key);
           // jenis berganti: pindahkan harga tawar jenis lama bila jenis lama tidak dipakai supplier lain
@@ -1529,6 +1532,11 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
         let auto="";if(canSell&&S.markup>0&&!(O.get(g)&&(O.get(g).d!==""||O.get(g).l!==""))){O.set(g,{l:sug(costM(g,"l")),d:hasL(g,"d")?sug(costM(g,"d")):""});auto=` Harga tawar ${g} disarankan dari biaya + ${S.markup}%, periksa di langkah 2.`}
         $("#pe_p").value="";$("#pe_n").value="";$("#pe_st").value="";$("#pe_hint").innerHTML=`<span class="ok-tag">✓ ${esc(g)} dari ${esc(name)} ${rp(p)} tersimpan.</span>${old&&old.key!==key?` Harga lama (${esc(old.grade)} · ${esc(old.name)}) diganti.`:""}${moved?` Harga tawar ikut pindah ke ${esc(moved)}.`:""}${auto}`;drawQ();drawO()}catch(e){fail(e)}finally{b.disabled=false}};
   }
+  if(canQ)$("#pe_ns").onclick=async()=>{const g=pick?normGrade(pick==="*"||!GRADES.includes(pick)?$("#pe_go").value:pick):"*";
+    if(!g){$("#pe_hint").innerHTML=`<span class="late-tag">Tulis nama jenisnya, atau kosongkan pilihan jenis untuk semua jenis</span>`;return}
+    if(g!=="*"&&[...qmap.values()].some(q=>q.grade===g)){$("#pe_hint").innerHTML=`<span class="late-tag">Jenis ${esc(g)} sudah punya harga supplier. Hapus harga itu dulu bila memang tidak ada stok.</span>`;return}
+    const b=$("#pe_ns");b.disabled=true;try{await setNS(g,true);drawQ();$("#pe_hint").innerHTML=`<span class="ok-tag">✓ ${g==="*"?"Semua jenis":esc(g)} ditandai NO STOCK.</span> Di quotation otomatis tertulis NO STOCK.`}catch(err){fail(err)}finally{b.disabled=false}};
+  $("#pe_q").addEventListener("click",async e=>{const nd=e.target.closest("[data-pensdel]");if(nd&&canQ){try{await setNS(nd.dataset.pensdel,false);drawQ();toast("Tanda NO STOCK dihapus")}catch(err){fail(err)}return}});
   $("#pe_q").addEventListener("click",async e=>{const u=e.target.closest("[data-peuse]"),d=e.target.closest("[data-pedel]"),ed=e.target.closest("[data-peedit]");
     if(ed&&canQ){const q=qmap.get(ed.dataset.peedit);if(!q)return;const gb=document.querySelector(`#pe_chips .chip[data-g="${CSS.escape(q.grade)}"]`);if(gb)gb.click();else{document.querySelector('#pe_chips .chip[data-g="*"]').click();$("#pe_go").value=q.grade}
       $("#pe_sup").value=q.name;$("#pe_p").value=fmtN(q.price);$("#pe_st").value=q.stock||"";$("#pe_n").value=q.note||"";
@@ -2206,22 +2214,10 @@ function openQuoteView(qid){
     ${st==="legacy"?`<div class="dupnote">Quotation ini dibuat saat uji coba dengan versi aplikasi sebelumnya dan belum melalui persetujuan. Klik <b>Ajukan ulang ke pimpinan</b> untuk memakainya, atau <b>Hapus</b> jika tidak diperlukan.</div>`:""}
     ${st==="pending"?`<p class="sub" style="margin:0">Tampilan di bawah adalah draft. Tanda tangan & cap muncul setelah disetujui pimpinan.</p>`:""}
     ${st==="approved"?`<p class="sub" style="margin:0">Disetujui ${esc(nameOf(a?.by))} · ${a?.at?fmtDT(a.at):""}${a?.note?` · “${esc(a.note)}”`:""}</p>`:""}
-    ${qSupPanel(d)}
     ${quoteSheet(d,st==="approved")}
    </div>
    <div class="df">${acts.join("")}</div></div></div>`;
-  document.querySelectorAll("#overlay [data-qvsup]").forEach(b=>b.onclick=()=>{S.onO2Close=()=>{if($("#overlay .paper"))openQuoteView(qid)};openPriceEditor([b.dataset.qvsup],{stack:true})});
 }
-function qSupPanel(d){const rows=d.rows||[];if(!rows.length||S.isGudang)return "";const seen=new Set();
-  const lines=rows.map(r=>{const it=S.items.find(x=>x.id===r.id);if(!it)return "";const g=rowGrade(r);const k=r.id+"|"+g;if(seen.has(k))return "";seen.add(k);
-    const qs=quotesOf(it).filter(q=>q.grade===g);const best=qs.length?qs.reduce((a,c)=>c.price<a.price?c:a):null;const c=costFor(it,g);const x=rowDL(r);const v=Number(x.l!==""?x.l:x.d)||0;
-    const mg=c>0&&v>0?(v-c)/v*100:null;
-    return `<tr><td><span class="pn">${esc(it.part||"—")}</span><div class="sub">${esc(it.desc||"")}</div></td><td>${gradePill(g)}</td><td class="num">${v?rp(v):"—"}</td>
-      <td class="num">${c>0?`<b>${rp(c)}</b>`:"—"}${best?`<div class="sub">${esc(best.name)}${qs.length>1?` +${qs.length-1}`:""}</div>`:""}</td>
-      <td class="num">${mg!=null?`<span class="mg ${mg<0?"neg":""}" style="display:inline">${mg.toFixed(1).replace(".",",")}%</span>`:"—"}</td>
-      <td>${canW()?`<button type="button" class="sm" data-qvsup="${esc(it.id)}">Ubah harga supplier</button>`:""}</td></tr>`}).join("");
-  return `<details class="qsup" ${S.qSupOpen?"open":""} ontoggle="S.qSupOpen=this.open"><summary><b>Harga supplier & margin</b> <span class="sub">— harga supplier bisa diubah kapan saja; harga di quotation tidak ikut berubah</span></summary>
-    <div class="tbl-wrap"><table class="mini" style="min-width:680px"><thead><tr><th>Barang</th><th>Jenis</th><th class="num">Harga di quotation</th><th class="num">Harga supplier sekarang</th><th class="num">Margin</th><th></th></tr></thead><tbody>${lines}</tbody></table></div></details>`}
 
 /* --- 5. approval workflow --- */
 function qStatus(q){if(!q.d)return "legacy";const a=(S.approvals||{})[q.id];if(a&&a.submittedAt===q.submittedAt)return a.status;return q.status==="draft"?"draft":"pending"}
@@ -2291,7 +2287,6 @@ async function downloadQuote(q,approved,fmt){const X=fmt==="xlsx";
 function openReview(qid){
   const q=(S.quotes||{})[qid];if(!q)return;const rows=q.d?.rows||[];const QC=quoteCostFn(q.d);const CM=QC.fn;const QM=["l","u"].includes(q.d?.mode)?q.d.mode:"lu";const RC=QM==="lu"?8:7;
   const P=rows.map(r=>{const it=S.items.find(x=>x.id===r.id)||{};const o=(it.sellOpts||[]).find(x=>x.g===rowGrade(r));const x=rowDL(r);return {d:x.d!==""?x.d:(o?o.d:""),l:x.l!==""?x.l:(o?o.l:"")}});
-  if(S.revKeep&&S.revKeep.qid===qid&&S.revKeep.P.length===P.length){S.revKeep.P.forEach((v,k)=>P[k]=v);const nt=S.revKeep.note;S.revKeep=null;setTimeout(()=>{if($("#r_note")&&nt)$("#r_note").value=nt})}
   $("#overlay").innerHTML=`<div class="scrim" data-close="1"></div><div class="modal"><div class="box" role="dialog" aria-label="Tinjau quotation">
    <div class="dh"><div><h2>Tinjau quotation ${esc(q.no)}</h2><div class="sub">${esc(q.d?.name||"")}${q.d?.attn?" · Attn. "+esc(q.d.attn):""} · diajukan ${esc(nameOf(q.createdBy))}</div></div><button type="button" class="ghost" data-close="1" aria-label="Tutup">✕</button></div>
    <div class="db">
@@ -2303,7 +2298,7 @@ function openReview(qid){
         ${r.ns?`<td class="num" colspan="${QM==="lu"?2:1}"><span class="nstag">NO STOCK</span></td>`:""}
         ${!r.ns&&QM!=="u"?`<td class="num"><input class="pin" data-rl="${k}" value="${P[k].l===""?"":fmtN(P[k].l)}" placeholder="laut" ${S.isApprover?"":"disabled"}>${(()=>{const lo=it.part?lastOffer(it.part,it.id):null;return lo?`<button type="button" class="linkbtn" data-uselast="${k}" data-v="${lo.offered}" title="Pakai harga ini untuk laut">${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</button>`:""})()}</td>`:""}
         ${!r.ns&&QM!=="l"?`<td class="num"><input class="pin" data-rd="${k}" value="${P[k].d===""?"":fmtN(P[k].d)}" placeholder="udara" ${S.isApprover?"":"disabled"}></td>`:""}
-        <td class="num" id="rm${k}"></td><td class="sub">${esc(qs.length?[...new Set(qs.map(x=>x.name))].join(", "):it.supplier||"")}${it.id&&canW()?`<div><button type="button" class="linkbtn" data-rsup="${esc(it.id)}">Ubah harga supplier</button></div>`:""}</td></tr>`}).join("")})()}
+        <td class="num" id="rm${k}"></td><td class="sub">${esc(qs.length?[...new Set(qs.map(x=>x.name))].join(", "):it.supplier||"")}</td></tr>`}).join("")})()}
     </tbody></table></div>
     <div class="pe-fbar">${QC.fl>0||QC.fu>0?`Ongkir pengiriman ke ${esc(q.d?.name||"customer")}: ${QC.fl>0?`laut <b>${rp(QC.fl)}</b>`:""}${QC.fl>0&&QC.fu>0?" · ":""}${QC.fu>0?`udara <b>${rp(QC.fu)}</b>`:""} — dibagi ke setiap barang sesuai nilai modal.`:QC.fl===null?"":`<span class="late-tag">Ongkir pengiriman belum diisi admin</span> Biaya masih modal saja.`}</div>
     <div class="bar"><span id="rTot"></span><span class="sub">Terms: ${esc([q.d?.priceTerms,q.d?.deliveryTime,q.d?.validityQ,q.d?.paymentTerms,q.d?.vat].filter(Boolean).join(" · "))}</span></div>
@@ -2324,7 +2319,6 @@ function openReview(qid){
   if($("#rFill"))$("#rFill").onclick=()=>{rows.forEach((r,k)=>{if(!r.ns&&P[k].d===""&&P[k].l===""){const lo=lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id);if(lo){const fk=QM==="u"?"d":"l";P[k][fk]=lo.offered;const el=document.querySelector(fk==="d"?`[data-rd="${k}"]`:`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k][fk])}}});$("#rFill").remove();recalc();toast(`Harga terakhir diisi ke kolom ${QM==="u"?"udara":"laut"}. Periksa jenis barang dan item yang dulu tidak diorder.`)};
   document.querySelectorAll("[data-rd],[data-rl]").forEach(el=>el.addEventListener("change",()=>{const v=el.value.trim()===""?"":parsePrice(el.value);if(v===null){toast("Format harga tidak dikenali");return}const k=+(el.dataset.rd??el.dataset.rl);P[k][el.dataset.rd!=null?"d":"l"]=v;el.value=v===""?"":fmtN(v);recalc()}));
   $("#r_draft").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false);
-  document.querySelectorAll("#overlay [data-rsup]").forEach(b=>b.onclick=()=>{S.revKeep={qid,P:P.map(x=>({...x})),note:$("#r_note")?.value||""};S.onO2Close=()=>{if($("#r_ok"))openReview(qid);else S.revKeep=null};openPriceEditor([b.dataset.rsup],{stack:true})});
   $("#r_draftx").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false,"xlsx");
   $("#r_rev").onclick=async()=>{const note=$("#r_note").value.trim();if(!note){toast("Tulis catatan revisi untuk admin");$("#r_note").focus();return}
     try{await saveOptsFromRows(withP());
