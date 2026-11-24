@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124134349"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124135028"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -134,6 +134,7 @@
 }
 .pe-mg{display:flex;align-items:center;justify-content:flex-end;gap:6px}.pe-odel{padding:2px 8px;min-height:28px}.pe-odel.armed{background:var(--s-batal,#c0392b);color:#fff}
 #overlay2 .scrim{z-index:50}#overlay2 .modal{z-index:51}
+.qsup{border:1px solid var(--line,#dde3ea);border-radius:10px;padding:8px 12px;margin-bottom:12px}.qsup summary{cursor:pointer;padding:4px 0}.qsup .tbl-wrap{margin-top:8px}
 </style></head><body>
 <title>Tracking Pengadaan SMM</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -709,10 +710,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124134349">
-<script src="config.js?v=20261124134349"></script>
+<link rel="stylesheet" href="supa.css?v=20261124135028">
+<script src="config.js?v=20261124135028"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124134349"></script>
+<script src="supa.js?v=20261124135028"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -2198,10 +2199,22 @@ function openQuoteView(qid){
     ${st==="legacy"?`<div class="dupnote">Quotation ini dibuat saat uji coba dengan versi aplikasi sebelumnya dan belum melalui persetujuan. Klik <b>Ajukan ulang ke pimpinan</b> untuk memakainya, atau <b>Hapus</b> jika tidak diperlukan.</div>`:""}
     ${st==="pending"?`<p class="sub" style="margin:0">Tampilan di bawah adalah draft. Tanda tangan & cap muncul setelah disetujui pimpinan.</p>`:""}
     ${st==="approved"?`<p class="sub" style="margin:0">Disetujui ${esc(nameOf(a?.by))} · ${a?.at?fmtDT(a.at):""}${a?.note?` · “${esc(a.note)}”`:""}</p>`:""}
+    ${qSupPanel(d)}
     ${quoteSheet(d,st==="approved")}
    </div>
    <div class="df">${acts.join("")}</div></div></div>`;
+  document.querySelectorAll("#overlay [data-qvsup]").forEach(b=>b.onclick=()=>{S.onO2Close=()=>{if($("#overlay .paper"))openQuoteView(qid)};openPriceEditor([b.dataset.qvsup],{stack:true})});
 }
+function qSupPanel(d){const rows=d.rows||[];if(!rows.length||S.isGudang)return "";const seen=new Set();
+  const lines=rows.map(r=>{const it=S.items.find(x=>x.id===r.id);if(!it)return "";const g=rowGrade(r);const k=r.id+"|"+g;if(seen.has(k))return "";seen.add(k);
+    const qs=quotesOf(it).filter(q=>q.grade===g);const best=qs.length?qs.reduce((a,c)=>c.price<a.price?c:a):null;const c=costFor(it,g);const x=rowDL(r);const v=Number(x.l!==""?x.l:x.d)||0;
+    const mg=c>0&&v>0?(v-c)/v*100:null;
+    return `<tr><td><span class="pn">${esc(it.part||"—")}</span><div class="sub">${esc(it.desc||"")}</div></td><td>${gradePill(g)}</td><td class="num">${v?rp(v):"—"}</td>
+      <td class="num">${c>0?`<b>${rp(c)}</b>`:"—"}${best?`<div class="sub">${esc(best.name)}${qs.length>1?` +${qs.length-1}`:""}</div>`:""}</td>
+      <td class="num">${mg!=null?`<span class="mg ${mg<0?"neg":""}" style="display:inline">${mg.toFixed(1).replace(".",",")}%</span>`:"—"}</td>
+      <td>${canW()?`<button type="button" class="sm" data-qvsup="${esc(it.id)}">Ubah harga supplier</button>`:""}</td></tr>`}).join("");
+  return `<details class="qsup" ${S.qSupOpen?"open":""} ontoggle="S.qSupOpen=this.open"><summary><b>Harga supplier & margin</b> <span class="sub">— harga supplier bisa diubah kapan saja; harga di quotation tidak ikut berubah</span></summary>
+    <div class="tbl-wrap"><table class="mini" style="min-width:680px"><thead><tr><th>Barang</th><th>Jenis</th><th class="num">Harga di quotation</th><th class="num">Harga supplier sekarang</th><th class="num">Margin</th><th></th></tr></thead><tbody>${lines}</tbody></table></div></details>`}
 
 /* --- 5. approval workflow --- */
 function qStatus(q){if(!q.d)return "legacy";const a=(S.approvals||{})[q.id];if(a&&a.submittedAt===q.submittedAt)return a.status;return q.status==="draft"?"draft":"pending"}
@@ -2271,6 +2284,7 @@ async function downloadQuote(q,approved,fmt){const X=fmt==="xlsx";
 function openReview(qid){
   const q=(S.quotes||{})[qid];if(!q)return;const rows=q.d?.rows||[];const QC=quoteCostFn(q.d);const CM=QC.fn;const QM=["l","u"].includes(q.d?.mode)?q.d.mode:"lu";const RC=QM==="lu"?8:7;
   const P=rows.map(r=>{const it=S.items.find(x=>x.id===r.id)||{};const o=(it.sellOpts||[]).find(x=>x.g===rowGrade(r));const x=rowDL(r);return {d:x.d!==""?x.d:(o?o.d:""),l:x.l!==""?x.l:(o?o.l:"")}});
+  if(S.revKeep&&S.revKeep.qid===qid&&S.revKeep.P.length===P.length){S.revKeep.P.forEach((v,k)=>P[k]=v);const nt=S.revKeep.note;S.revKeep=null;setTimeout(()=>{if($("#r_note")&&nt)$("#r_note").value=nt})}
   $("#overlay").innerHTML=`<div class="scrim" data-close="1"></div><div class="modal"><div class="box" role="dialog" aria-label="Tinjau quotation">
    <div class="dh"><div><h2>Tinjau quotation ${esc(q.no)}</h2><div class="sub">${esc(q.d?.name||"")}${q.d?.attn?" · Attn. "+esc(q.d.attn):""} · diajukan ${esc(nameOf(q.createdBy))}</div></div><button type="button" class="ghost" data-close="1" aria-label="Tutup">✕</button></div>
    <div class="db">
@@ -2281,7 +2295,7 @@ function openReview(qid){
       return g+`<tr><td>${esc(r.desc)}${lost?`<div class="seen lost">Pernah kalah${lost.sellPrice?" @ "+rp(lost.sellPrice):""}</div>`:""}</td><td><b>${esc(r.brand||"—")}</b></td><td class="num">${r.qty} <span class="sub">${esc(r.unit)}</span></td><td class="num">${(()=>{const cl=CM(it,g0,"l"),cu=QC.fu>0||(QC.fu===null&&hasFreight(it,"d"))?CM(it,g0,"d"):null;const ln=(lb,v)=>v>0?`<div><span class="sub">${lb}</span> ${rp(v)} <span class="sub">→ saran ${fmtN(Math.round(v*(1+S.markup/100)/100)*100)}</span></div>`:"";const cu2=QM==="u"?CM(it,g0,"d"):cu;const sl=QM!=="u"&&cl>0,su=QM!=="l"&&cu2>0;return (sl||su)?(sl?ln("L",cl):"")+(su?ln("U",cu2):""):"—"})()}</td>
         ${QM!=="u"?`<td class="num"><input class="pin" data-rl="${k}" value="${P[k].l===""?"":fmtN(P[k].l)}" placeholder="laut" ${S.isApprover?"":"disabled"}>${(()=>{const lo=it.part?lastOffer(it.part,it.id):null;return lo?`<button type="button" class="linkbtn" data-uselast="${k}" data-v="${lo.offered}" title="Pakai harga ini untuk laut">${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</button>`:""})()}</td>`:""}
         ${QM!=="l"?`<td class="num"><input class="pin" data-rd="${k}" value="${P[k].d===""?"":fmtN(P[k].d)}" placeholder="udara" ${S.isApprover?"":"disabled"}></td>`:""}
-        <td class="num" id="rm${k}"></td><td class="sub">${esc(qs.length?[...new Set(qs.map(x=>x.name))].join(", "):it.supplier||"")}</td></tr>`}).join("")})()}
+        <td class="num" id="rm${k}"></td><td class="sub">${esc(qs.length?[...new Set(qs.map(x=>x.name))].join(", "):it.supplier||"")}${it.id&&canW()?`<div><button type="button" class="linkbtn" data-rsup="${esc(it.id)}">Ubah harga supplier</button></div>`:""}</td></tr>`}).join("")})()}
     </tbody></table></div>
     <div class="pe-fbar">${QC.fl>0||QC.fu>0?`Ongkir pengiriman ke ${esc(q.d?.name||"customer")}: ${QC.fl>0?`laut <b>${rp(QC.fl)}</b>`:""}${QC.fl>0&&QC.fu>0?" · ":""}${QC.fu>0?`udara <b>${rp(QC.fu)}</b>`:""} — dibagi ke setiap barang sesuai nilai modal.`:QC.fl===null?"":`<span class="late-tag">Ongkir pengiriman belum diisi admin</span> Biaya masih modal saja.`}</div>
     <div class="bar"><span id="rTot"></span><span class="sub">Terms: ${esc([q.d?.priceTerms,q.d?.deliveryTime,q.d?.validityQ,q.d?.paymentTerms,q.d?.vat].filter(Boolean).join(" · "))}</span></div>
@@ -2301,6 +2315,7 @@ function openReview(qid){
   if($("#rFill"))$("#rFill").onclick=()=>{rows.forEach((r,k)=>{if(P[k].d===""&&P[k].l===""){const lo=lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id);if(lo){const fk=QM==="u"?"d":"l";P[k][fk]=lo.offered;const el=document.querySelector(fk==="d"?`[data-rd="${k}"]`:`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k][fk])}}});$("#rFill").remove();recalc();toast(`Harga terakhir diisi ke kolom ${QM==="u"?"udara":"laut"}. Periksa jenis barang dan item yang dulu tidak diorder.`)};
   document.querySelectorAll("[data-rd],[data-rl]").forEach(el=>el.addEventListener("change",()=>{const v=el.value.trim()===""?"":parsePrice(el.value);if(v===null){toast("Format harga tidak dikenali");return}const k=+(el.dataset.rd??el.dataset.rl);P[k][el.dataset.rd!=null?"d":"l"]=v;el.value=v===""?"":fmtN(v);recalc()}));
   $("#r_draft").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false);
+  document.querySelectorAll("#overlay [data-rsup]").forEach(b=>b.onclick=()=>{S.revKeep={qid,P:P.map(x=>({...x})),note:$("#r_note")?.value||""};S.onO2Close=()=>{if($("#r_ok"))openReview(qid);else S.revKeep=null};openPriceEditor([b.dataset.rsup],{stack:true})});
   $("#r_draftx").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false,"xlsx");
   $("#r_rev").onclick=async()=>{const note=$("#r_note").value.trim();if(!note){toast("Tulis catatan revisi untuk admin");$("#r_note").focus();return}
     try{await saveOptsFromRows(withP());
