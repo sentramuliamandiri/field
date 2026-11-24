@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261123155305"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124113437"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -707,10 +707,10 @@ a{color:var(--ink)}
 <div id="overlay"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261123155305">
-<script src="config.js?v=20261123155305"></script>
+<link rel="stylesheet" href="supa.css?v=20261124113437">
+<script src="config.js?v=20261124113437"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261123155305"></script>
+<script src="supa.js?v=20261124113437"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -2375,6 +2375,7 @@ function openRfqModal(rfqId){
       <div><b>Unggah PDF atau foto RFQ</b><div class="sub">${aiOk?"Termasuk hasil scan dan foto WhatsApp. Satu PDF boleh berisi beberapa RFQ; setiap halaman dibaca otomatis untuk mengambil no. RFQ, part number, nama barang, unit, dan qty.":"Pembacaan scan dengan AI tidak tersedia di tampilan ini. PDF berisi teks tetap bisa dibaca."}</div></div>
       <label class="btn primary-btn" for="fileIn">Pilih file…</label><input id="fileIn" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple hidden>
     </div>
+    ${aiOk?`<label class="toggle sub" style="margin-top:-6px"><input type="checkbox" id="noAiChk" ${noAiPref?"checked":""}> Baca tanpa AI (gratis; paling cocok untuk PDF berisi teks, foto/scan hasilnya kurang akurat)</label>`:""}
     <details id="pasteBox"><summary>Atau tempel teks dari email / Excel</summary>
       <textarea id="paste" rows="6" placeholder="Contoh:
 1  600-211-1231  FILTER OIL  4  PCS
@@ -2388,11 +2389,14 @@ function openRfqModal(rfqId){
    </div>
    <div class="df"><span class="sub" id="saveSum" style="margin-right:auto"></span><button type="button" data-close="1">Batal</button><button type="button" class="primary" id="rSave">Simpan</button></div>
   </div></div>`;
-  $("#btnParse").onclick=()=>{syncDraft();const its=parsePaste($("#paste").value).map(d=>({...d,unitAlat:""}));
-    if(!its.length){msg("Tidak ada item terbaca. Coba “Baca teks dengan AI” atau isi manual.");return}
+  $("#btnParse").onclick=()=>{syncDraft();const txt=$("#paste").value;const its=parsePaste(txt).map(d=>({...d,unitAlat:""}));
+    const rd=ruleParseRfq(txt,"");const rn=rd.reduce((s,d)=>s+d.items.length,0);
+    if(rn&&rn>=its.length){addDocs(rd);msg(`${rn} item dari ${rd.length} RFQ terbaca. Periksa lalu lengkapi no. RFQ dan pelanggan bila kosong.`);return}
+    if(!its.length){msg("Tidak ada item terbaca. Pastikan tiap baris berisi nomor, nama/part number, qty dan satuan, atau isi manual.");return}
     addDocs([{rfqNo:"",date:"",customer:"",items:its}]);msg(`${its.length} item terbaca. Lengkapi no. RFQ dan pelanggan bila kosong.`)};
   if($("#btnParseAi"))$("#btnParseAi").onclick=()=>aiReadText($("#paste").value);
   $("#btnAddGroup").onclick=()=>{syncDraft();if(addTarget&&groups.length){groups[0].items.push(blankItem())}else addDocs([{rfqNo:"",date:today(),customer:"",items:[blankItem()]}]);renderDraft()};
+  if($("#noAiChk"))$("#noAiChk").onchange=e=>{noAiPref=e.target.checked;try{localStorage.setItem("smm_noai",noAiPref?"1":"0")}catch{}};
   $("#fileIn").onchange=e=>{const fs=[...e.target.files];e.target.value="";readFiles(fs)};
   const drop=$("#drop");drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("over")});drop.addEventListener("dragleave",()=>drop.classList.remove("over"));
   drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");readFiles([...e.dataTransfer.files])});
@@ -2576,16 +2580,84 @@ async function readPage(src,n,signal,deg,st){
 }
 async function readFiles(fs){fs=fs.filter(f=>/pdf|image/.test(f.type));if(!fs.length)return;
   for(let i=0;i<fs.length;i++){if(!$("#prev"))return;if(fs.length>1)toast(`File ${i+1} dari ${fs.length}: ${fs[i].name}`);await readFile(fs[i]);if(S.aiStopped)break}}
+/* Pembaca RFQ tanpa AI: mengurai teks (dari PDF atau OCR) menjadi RFQ + item. */
+const RULE_UNITS="pcs|pc|set|sets|unit|units|ea|each|btl|botol|ltr|liter|lt|kg|mtr|meter|m|roll|rol|box|pack|pak|pck|lbr|lembar|drum|pail|can|klg|kaleng|tube|pasang|psg|pair|lot|assy|buah|bh|bks|dus|sak|batang|btg|ls|kit|sheet|jrg|jerigen|gln|galon|rim|cm|mm";
+const RULE_ROW=new RegExp("^\\s*(\\d{1,3})[.)]?\\s+(.+?)\\s+(\\d{1,5}(?:[.,]\\d{1,3})?)\\s*(" + RULE_UNITS + ")\\.?(?:\\s{2,}.*)?$","i");
+const RULE_ROW_QTYFIRST=new RegExp("^\\s*(\\d{1,3})[.)]?\\s+(.+?)\\s+(" + RULE_UNITS + ")\\.?\\s+(\\d{1,5}(?:[.,]\\d{1,3})?)\\s*$","i");
+const RULE_DOCNO=/\b(\d{1,5}\/\d{1,2}\/\d{4}\/[A-Z0-9][\w\/.-]*|(?:RFQ|PR|PP|MR|SPB|SPP|PO)[\s\/.:-]*No?\.?[\s:]*[A-Z0-9][\w\/.-]{2,}|(?:RFQ|PR|PP|MR|SPB|SPP)[-\/][A-Z0-9][\w\/.-]{2,})/i;
+function rulePart(desc){
+  const cands=[];
+  const re=/\(?\b(?:P\/?N[:.\s]*)?([A-Z]{1,4}[-\s]?\d{3,}[A-Z0-9-]*|\d{2,}-\d{2,}[-A-Z0-9]*|[A-Z0-9]{1,5}\d[A-Z0-9]*-[A-Z0-9-]{2,}|[A-Z]\d{4,}[A-Z0-9-]*|\d{6,}[A-Z]?)\b\)?/g;
+  let m;while((m=re.exec(desc))){const raw=m[0],pn=m[1].replace(/\s+/g,"");
+    if(/^\d{1,4}$/.test(pn))continue;
+    if(/^(M\d{1,2}|\d+MM|\d{2,4}-\d{1,2})$/i.test(pn))continue; // ukuran (M25, 750-16)
+    const sp=m[1].match(/^([A-Z]{1,4})\s+(\d.*)$/);
+    if(sp&&!/^(MK|MB|ME|MC|MH|MX|MD|MR|MQ|MZ)$/.test(sp[1])){cands.push({raw:sp[2],pn:sp[2],i:m.index+m[0].indexOf(sp[2])});continue}
+    cands.push({raw,pn,i:m.index})}
+  if(!cands.length)return {part:"",desc:desc.trim()};
+  const c=cands[cands.length-1];
+  const d=(desc.slice(0,c.i)+desc.slice(c.i+c.raw.length)).replace(/\bP\/?N\b[:.]?/i,"").replace(/[,(\s]+$/,"").replace(/\(\s*\)/g,"").replace(/\s{2,}/g," ").trim();
+  return {part:c.pn,desc:d||desc.trim()};
+}
+function ruleParseRfq(text,fallbackNo){
+  const lines=String(text||"").split(/\r?\n/).map(l=>l.replace(/ /g," ").replace(/\s*\|\|.*$/,"").replace(/\s+$/,"")).filter(l=>l.trim());
+  let customer="",docNo="",date="";
+  for(const l of lines.slice(0,15)){
+    if(!customer){const m=l.match(/\b(PT\.?\s*[A-Z][\w.&,\s-]{2,60}?|CV\.?\s*[A-Z][\w.&,\s-]{2,60}?)(?=\s{2,}|\s*\(|$)/);if(m)customer=m[1].replace(/\s+/g," ").trim()}
+    if(!docNo){const m=l.match(RULE_DOCNO);if(m&&!/^\s*\d{1,3}\s/.test(l))docNo=m[1].replace(/^(RFQ|PR|PP|MR|SPB|SPP|PO)[\s\/.:-]*No?\.?[\s:]*/i,"").trim()}
+    if(!date){const m=l.match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](20\d{2})\b/);if(m)date=`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`}
+  }
+  const items=[];let pending=[];
+  for(const l of lines){
+    let m=l.match(RULE_ROW),qty,unit,mid;
+    if(m){mid=m[2];qty=m[3];unit=m[4]}else{const m2=l.match(RULE_ROW_QTYFIRST);if(m2){m=m2;mid=m2[2];unit=m2[3];qty=m2[4]}}
+    if(!m){
+      if(/^\s*(no\.?|nomor)\b/i.test(l)&&/(desc|nama|item|barang|part)/i.test(l))continue; // header
+      if(items.length||pending.length||/[a-z]/i.test(l))pending.push(l.trim());
+      if(pending.length>3)pending.shift();
+      continue}
+    let no="";const dm=mid.match(RULE_DOCNO);
+    if(dm&&dm.index<4){no=dm[1].replace(/^(RFQ|PR|PP|MR|SPB|SPP|PO)[\s\/.:-]*No?\.?[\s:]*/i,"").trim();mid=mid.slice(dm.index+dm[0].length)}
+    let desc=mid.replace(/\s{2,}/g," ").trim();
+    // baris sebelumnya tanpa nomor = awal deskripsi yang terpotong (bila deskripsi baris ini pendek)
+    if(pending.length&&items.length&&desc.split(" ").length<=2){desc=pending.join(" ")+" "+desc;pending=[]}
+    else if(pending.length&&!items.length){pending=[]}
+    else if(pending.length){const last=items[items.length-1];last.desc=(last.desc+" "+pending.join(" ")).trim();pending=[]}
+    const p=rulePart(desc);
+    items.push({no,part:p.part,desc:p.desc,qty:Number(String(qty).replace(",","."))||1,unit:unit.toUpperCase().replace(/^PC$/,"PCS")});
+  }
+  if(pending.length&&items.length){const last=items[items.length-1];if(pending.join(" ").length<60)last.desc=(last.desc+" "+pending.join(" ")).trim()}
+  const groups=new Map();
+  for(const it of items){const k=it.no||docNo||fallbackNo||"";if(!groups.has(k))groups.set(k,[]);groups.get(k).push(it)}
+  return [...groups.entries()].map(([k,its])=>({rfqNo:k,date,customer,items:its.map(({no,...x})=>({...x,unitAlat:""}))}));
+}
+
+let noAiPref=(()=>{try{return localStorage.getItem("smm_noai")==="1"}catch{return false}})();
+async function readFileRules(f,src,why){
+  const total=src.count,base=f.name.replace(/\.[a-z0-9]+$/i,"");const docs=[];let ocrPages=0;
+  aiCtl=new AbortController();const signal=aiCtl.signal;$("#aiStop").hidden=false;
+  try{
+    for(let n=1;n<=total;n++){if(signal.aborted)break;
+      let t=src.textOnly?(src.texts[n-1]||""):src.pdf?await pdfPageText(src.pdf,n):"";
+      if(t.replace(/\s/g,"").length<=80){msg(`Membaca halaman ${n} dari ${total} dengan OCR (tanpa AI, ± 15–30 detik)…`);ocrPages++;
+        try{const o=await ocrCanvas(await src.get(n),signal);t=o.text}catch(e){if(e?.code==="cancelled"||signal.aborted)break;t=""}}
+      else msg(`Membaca teks halaman ${n} dari ${total}…`);
+      docs.push(...ruleParseRfq(t,total>1?"":base))}
+  }finally{aiCtl=null;if($("#aiStop"))$("#aiStop").hidden=true}
+  if(!$("#prev"))return;
+  const custs=[...new Set(docs.map(d=>d.customer).filter(Boolean))];if(custs.length===1)docs.forEach(d=>{if(!d.customer)d.customer=custs[0]});
+  docs.forEach(d=>{if(!d.rfqNo)d.rfqNo=base});
+  addDocs(docs);const nItems=docs.reduce((s,d)=>s+d.items.length,0),nDocs=new Set(docs.map(d=>normNo(d.rfqNo))).size;
+  diag("rules-read",{pages:total,ocrPages,nItems,why:why||""});
+  msg(nItems?`${why?why+" ":""}${nItems} item dari ${nDocs} RFQ terbaca tanpa AI${ocrPages?" (OCR)":""}. Periksa part number, nama barang dan qty sebelum menyimpan.`
+    :`${why?why+" ":""}Tidak ada item yang terbaca tanpa AI${ocrPages?" (foto/scan kurang jelas)":""}. Coba foto lebih terang & lurus, tempel teks, atau isi manual.`);
+}
 async function readFile(f){S.aiStopped=false;
   if(aiCtl){toast("Tunggu pembacaan sebelumnya selesai");return}
   msg("Membuka "+f.name+"…");
   diag("upload",{name:f.name.slice(0,80),type:f.type,size:f.size});
   let src;try{src=await fileCanvases(f)}catch(e){diag("open-fail",errInfo(e));msg(e?.message?"File tidak dapat dibuka: "+String(e.message).slice(0,140):"File tidak dapat dibuka.");return}
-  if(!S.sample){diag("no-sample",{name:f.name.slice(0,80)});
-    if(!src.pdf){msg("Pembacaan foto dengan AI tidak tersedia di tampilan ini.");return}
-    const t=await pdfToText(f).catch(()=>"");const its=t.trim()?parsePaste(t).map(d=>({...d,unitAlat:""})):[];
-    if(!its.length){msg("PDF ini hasil scan dan pembacaan AI tidak tersedia di tampilan ini. Isi item secara manual.");return}
-    addDocs([{rfqNo:f.name.replace(/\.pdf$/i,""),date:"",customer:"",items:its}]);msg(`${its.length} item terbaca dari teks PDF. Periksa hasilnya.`);return}
+  if(!S.sample||S.noAI||noAiPref){return readFileRules(f,src,S.noAI&&!noAiPref?"AI belum aktif, dibaca tanpa AI.":"")}
   aiCtl=new AbortController();const signal=aiCtl.signal;$("#aiStop").hidden=false;
   const total=src.count;const results=new Array(total);let done=0,failed=0,lastErr=null,next=2;
   const st={mode:S.aiImages?"AI":"OCR"};
@@ -2596,6 +2668,10 @@ async function readFile(f){S.aiStopped=false;
   catch(e){if(!(e?.code==="cancelled"||signal.aborted)){lastErr=e;
     if(["not_granted","sampling_disabled","not_declared","images_unavailable","session_expired","rate_limited","capability_disabled","pdf","ocr"].includes(e?.code)||!e?.code){next=total+1}
     failed++;results[0]={failed:1};done=1}}
+  if(lastErr&&!results.slice(1).some(Boolean)&&["no_key","unauthorized","network","ai_error"].includes(lastErr.code)){
+    if(lastErr.code==="no_key"||/credit|billing|api[_ ]key/i.test(lastErr.message||""))S.noAI=true;
+    aiCtl=null;if($("#aiStop"))$("#aiStop").hidden=true;
+    return readFileRules(f,src,aiErr(lastErr).split(". ")[0]+". Dibaca tanpa AI.")}
   const worker=async()=>{while(next<=total&&!signal.aborted){const n=next++;
     try{results[n-1]=await readPage(src,n,signal,deg,st)}catch(e){if(e?.code==="cancelled"||signal.aborted)return;failed++;lastErr=e;results[n-1]={failed:n}}
     done++;if($("#parseMsg")&&!signal.aborted)msg(`Membaca halaman (${st.mode})… ${done} dari ${total} selesai`)}};
