@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124133648"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124134349"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -709,10 +709,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124133648">
-<script src="config.js?v=20261124133648"></script>
+<link rel="stylesheet" href="supa.css?v=20261124134349">
+<script src="config.js?v=20261124134349"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124133648"></script>
+<script src="supa.js?v=20261124134349"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1451,7 +1451,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
   const O=new Map();(f.sellOpts||[]).forEach(o=>O.set(o.g,{d:o.d,l:o.l}));
   const hasQ=g=>[...qmap.values()].some(q=>q.grade===g);
   const offerGrades=()=>sortG([...new Set([...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()])]);
-  let pick="";
+  let pick="",editKey=null;
   const lo=f.part?partOcc(f.part).filter(o=>!ids.includes(o.id)).find(o=>o.offered!=null):null;
   const units=[...new Set(its.map(i=>i.unitAlat).filter(Boolean))];
   const supList=[...new Set([...Object.values(S.suppliers||{}).map(s=>s&&s.name),...S.items.map(i=>i.supplier),...S.items.flatMap(i=>quotesOf(i).map(q=>q.name))].filter(Boolean))].sort();
@@ -1509,15 +1509,24 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
       const hint=t=>{$("#pe_hint").innerHTML=`<span class="late-tag">${t}</span>`};
       if(!g){hint("Pilih jenis barang dulu (OEM, GENUINE, …)");return}if(!name){hint("Isi nama supplier");$("#pe_sup").focus();return}if(!(p>0)){hint("Isi harga satuan");$("#pe_p").focus();return}
       const b=$("#pe_add");b.disabled=true;
-      try{const st=$("#pe_st").value,nt=$("#pe_n").value.trim();const key=await addSupplierQuote(ids,{name,grade:g,price:p,stock:st,note:nt});
-        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today()};qmap.set(key,nq);
+      try{const st=$("#pe_st").value,nt=$("#pe_n").value.trim();const old=editKey?qmap.get(editKey):null;const key=await addSupplierQuote(ids,{name,grade:g,price:p,stock:st,note:nt});
+        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today()};
+        let moved="";
+        if(old&&old.key!==key){await removeSupplierQuote(ids,old.key);qmap.delete(old.key);
+          // jenis berganti: pindahkan harga tawar jenis lama bila jenis lama tidak dipakai supplier lain
+          if(old.grade!==g&&![...qmap.values()].some(x=>x.grade===old.grade)){const oo=O.get(old.grade);
+            if(oo&&(oo.l!==""||oo.d!=="")&&!(O.get(g)&&(O.get(g).l!==""||O.get(g).d!==""))){O.set(g,{...oo});moved=g}O.delete(old.grade);
+            if(canSell&&(f.sellOpts||[]).some(o=>o.g===old.grade)){const opts=[...O.entries()].map(([gg,o])=>({g:gg,...o})).filter(o=>o.d!==""||o.l!=="");await setSellOpts(ids,opts)}}}
+        qmap.set(key,nq);editKey=null;$("#pe_add").textContent="Simpan harga";
         let auto="";if(canSell&&S.markup>0&&!(O.get(g)&&(O.get(g).d!==""||O.get(g).l!==""))){O.set(g,{l:sug(costM(g,"l")),d:hasL(g,"d")?sug(costM(g,"d")):""});auto=` Harga tawar ${g} disarankan dari biaya + ${S.markup}%, periksa di langkah 2.`}
-        $("#pe_p").value="";$("#pe_n").value="";$("#pe_st").value="";$("#pe_hint").innerHTML=`<span class="ok-tag">✓ ${esc(g)} dari ${esc(name)} ${rp(p)} tersimpan.</span>${auto}`;drawQ();drawO()}catch(e){fail(e)}finally{b.disabled=false}};
+        $("#pe_p").value="";$("#pe_n").value="";$("#pe_st").value="";$("#pe_hint").innerHTML=`<span class="ok-tag">✓ ${esc(g)} dari ${esc(name)} ${rp(p)} tersimpan.</span>${old&&old.key!==key?` Harga lama (${esc(old.grade)} · ${esc(old.name)}) diganti.`:""}${moved?` Harga tawar ikut pindah ke ${esc(moved)}.`:""}${auto}`;drawQ();drawO()}catch(e){fail(e)}finally{b.disabled=false}};
   }
   $("#pe_q").addEventListener("click",async e=>{const u=e.target.closest("[data-peuse]"),d=e.target.closest("[data-pedel]"),ed=e.target.closest("[data-peedit]");
     if(ed&&canQ){const q=qmap.get(ed.dataset.peedit);if(!q)return;const gb=document.querySelector(`#pe_chips .chip[data-g="${CSS.escape(q.grade)}"]`);if(gb)gb.click();else{document.querySelector('#pe_chips .chip[data-g="*"]').click();$("#pe_go").value=q.grade}
       $("#pe_sup").value=q.name;$("#pe_p").value=fmtN(q.price);$("#pe_st").value=q.stock||"";$("#pe_n").value=q.note||"";
-      $("#pe_hint").innerHTML=`Mengubah harga ${esc(q.grade)} dari ${esc(q.name)}. Perbaiki lalu klik <b>Simpan harga</b>.`;$("#pe_p").focus();return}
+      editKey=q.key;$("#pe_add").textContent="Simpan perubahan";
+      $("#pe_hint").innerHTML=`Mengubah harga ${esc(q.grade)} dari ${esc(q.name)}. Jenis barang, supplier, dan harga boleh diganti, lalu klik <b>Simpan perubahan</b>. <button type="button" class="linkbtn" id="pe_cancel">Batal ubah</button>`;
+      $("#pe_cancel").onclick=()=>{editKey=null;$("#pe_add").textContent="Simpan harga";$("#pe_sup").value="";$("#pe_p").value="";$("#pe_n").value="";$("#pe_st").value="";$("#pe_hint").innerHTML=""};$("#pe_p").focus();return}
     if(u){const q=qmap.get(u.dataset.peuse);if(!q)return;try{await runBatch(ids,{price:q.price,supplier:q.name,source:"supplier"});its.forEach(it=>{it.price=q.price;it.supplier=q.name});drawQ();toast(`Modal pembelian: ${q.name} ${q.grade} ${rp(q.price)}`)}catch(err){fail(err)}}
     if(d){const k=d.dataset.pedel;if(S.peDel!==k){S.peDel=k;d.textContent="Hapus?";d.classList.add("armed");setTimeout(()=>{if(S.peDel===k){S.peDel=null;d.textContent="✕";d.classList.remove("armed")}},4000);return}S.peDel=null;
       try{await removeSupplierQuote(ids,k);qmap.delete(k);drawQ();drawO();toast("Harga supplier dihapus")}catch(err){fail(err)}}});
