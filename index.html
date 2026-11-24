@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124130850"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124132854"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -132,6 +132,7 @@
  .gfoot{padding:10px 12px;border-radius:0 0 16px 16px}
  .gfoot button{min-height:40px}
 }
+.pe-mg{display:flex;align-items:center;justify-content:flex-end;gap:6px}.pe-odel{padding:2px 8px;min-height:28px}.pe-odel.armed{background:var(--s-batal,#c0392b);color:#fff}
 </style></head><body>
 <title>Tracking Pengadaan SMM</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -707,10 +708,10 @@ a{color:var(--ink)}
 <div id="overlay"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124130850">
-<script src="config.js?v=20261124130850"></script>
+<link rel="stylesheet" href="supa.css?v=20261124132854">
+<script src="config.js?v=20261124132854"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124130850"></script>
+<script src="supa.js?v=20261124132854"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1070,7 +1071,7 @@ async function aiReadReply(){
   const pool=S.items.filter(i=>!DONE.has(i.status)&&i.part);const pref=sup?pool.filter(i=>(i.askedTo||[]).includes(sup)):[];
   const cand=[...new Map((pref.length?pref:pool).map(i=>[normPn(i.part),`${i.part} — ${i.desc}`])).values()].slice(0,400);
   $("#upMsg").textContent="Membaca balasan dengan AI…";$("#upAi").disabled=true;
-  try{const r=await askJson(`Teks berikut adalah balasan WhatsApp/email dari supplier${sup?" ("+sup+")":""} atas permintaan harga spare parts dari PT Sentra Mulia Mandiri.\n\nDaftar part yang kami tanyakan (part number — nama):\n${cand.join("\n")}\n\nAmbil harga satuan untuk setiap part yang disebut di balasan. Cocokkan dengan part number di daftar (abaikan perbedaan spasi/tanda hubung; jika supplier hanya menyebut nama barang, cocokkan ke part yang paling jelas). Harga dalam rupiah angka penuh: "185rb" atau "185k" = 185000, "1,2jt" = 1200000, "185.000" = 185000. stock: "ready", "indent", "kosong", atau "". grade: jenis barang yang diberi harga, huruf besar: "OEM", "GENUINE", "ORIGINAL", "AFTERMARKET", "KW", atau label lain yang disebut supplier (mis. "TAIWAN"); kosongkan jika tidak disebut. Jika satu part diberi beberapa harga untuk jenis berbeda (mis. OEM 150rb, Genuine 210rb), buat entri terpisah per jenis. note: info singkat lain (merek, lead time), boleh kosong. Lewati part yang tidak diberi harga.\n\nBalas HANYA JSON: {"items":[{"partNumber":"","grade":"","price":0,"stock":"","note":""}]}\n\nBALASAN SUPPLIER:\n${txt.slice(0,30000)}`,{});
+  try{const r=await askJson(`Teks berikut adalah balasan WhatsApp/email dari supplier${sup?" ("+sup+")":""} atas permintaan harga spare parts dari PT Sentra Mulia Mandiri.\n\nDaftar part yang kami tanyakan (part number — nama):\n${cand.join("\n")}\n\nAmbil harga satuan untuk setiap part yang disebut di balasan. Cocokkan dengan part number di daftar (abaikan perbedaan spasi/tanda hubung; jika supplier hanya menyebut nama barang, cocokkan ke part yang paling jelas). Harga dalam rupiah angka penuh: "185rb" atau "185k" = 185000, "1,2jt" = 1200000, "185.000" = 185000. stock: "ready", "indent", "kosong", atau "". grade: jenis barang yang diberi harga, huruf besar: "OEM", "GENUINE", "ORIGINAL", "THAILAND", "JEPANG" (barang buatan Jepang/Japan), atau label lain yang disebut supplier (mis. "TAIWAN"); kosongkan jika tidak disebut. Jika satu part diberi beberapa harga untuk jenis berbeda (mis. OEM 150rb, Genuine 210rb), buat entri terpisah per jenis. note: info singkat lain (merek, lead time), boleh kosong. Lewati part yang tidak diberi harga.\n\nBalas HANYA JSON: {"items":[{"partNumber":"","grade":"","price":0,"stock":"","note":""}]}\n\nBALASAN SUPPLIER:\n${txt.slice(0,30000)}`,{});
     const rows=(r?.items||[]).filter(x=>x&&x.partNumber);
     S.extraGrades=[...new Set([...(S.extraGrades||[]),...rows.map(x=>normGrade(x.grade)).filter(Boolean)])];
     $("#upText").value=rows.map(x=>[x.partNumber,Number(x.price)||"",normGrade(x.grade)].filter(v=>v!=="").join("\t")).join("\n");
@@ -1129,7 +1130,7 @@ function openQuote(ids,qid){
     <div class="bar"><span class="sub">Baris dikelompokkan per unit (judul tebal di PDF). OEM dan Genuine tampil sebagai baris terpisah; klik <b>+ jenis</b> untuk menambah baris jenis lain dari part yang sama. Kolom Brand menentukan jenis.</span><span class="sub" id="q_warn"></span></div>
     <div class="qmode"><span class="qm-l">Harga yang ditawarkan</span><div class="seg qm-seg" role="radiogroup" aria-label="Harga yang ditawarkan"><button type="button" data-qm="l">Laut saja</button><button type="button" data-qm="u">Udara saja</button><button type="button" data-qm="lu">Laut &amp; Udara</button></div></div>
     <div id="q_tbl"></div>
-    <datalist id="dlBrand"><option value="OEM"><option value="GENUINE"><option value="ORIGINAL"><option value="AFTERMARKET"></datalist>
+    <datalist id="dlBrand"><option value="OEM"><option value="GENUINE"><option value="ORIGINAL"><option value="THAILAND"><option value="JEPANG"></datalist>
     <details><summary>Terms & Conditions</summary><div class="g4" style="margin-top:8px">
       ${f("q_priceTerms","Price Terms",c.priceTerms)}${f("q_deliveryTime","Delivery Time",c.deliveryTime)}${f("q_validityQ","Validity of Quotation",c.validityQ)}${f("q_paymentTerms","Payment Terms",c.paymentTerms)}${f("q_vat","VAT",c.vat)}${f("q_signer","Penanda tangan",c.signer)}
       <label class="toggle" style="align-self:end"><input type="checkbox" id="q_sig" ${c.sig!==false?"checked":""}> Sertakan tanda tangan & cap</label>
@@ -1345,8 +1346,9 @@ function openOutcome(ids){
 }
 
 /* --- 8. multi-grade prices (jenis barang, laut/udara; field l = laut, d = udara) --- */
-const GRADES=["OEM","GENUINE","ORIGINAL","AFTERMARKET","KW"];
-const normGrade=s=>String(s||"").trim().toUpperCase().replace(/\s+/g," ");
+const GRADES=["OEM","GENUINE","ORIGINAL","THAILAND","JEPANG"];
+const GRADE_RENAME={AFTERMARKET:"THAILAND",KW:"JEPANG"};
+const normGrade=s=>{const g=String(s||"").trim().toUpperCase().replace(/\s+/g," ");return GRADE_RENAME[g]||g};
 function knownGrades(){const all=new Set([...GRADES,...(S.extraGrades||[])]);S.items.forEach(i=>Object.values(i.quotes||{}).forEach(q=>{const g=normGrade(q&&q.grade);if(g)all.add(g)}));return all}
 const gradeKey=g=>supKey(normGrade(g)||"umum");
 function gradeDL(){const all=knownGrades();return `<datalist id="dlGrade">${[...all].map(g=>`<option value="${esc(g)}">`).join("")}</datalist>`}
@@ -1391,6 +1393,7 @@ async function setSellOpts(ids,optsFor){
 async function addSupplierQuote(ids,{name,grade,price,stock,note}){
   const key=supKey(name)+"__"+gradeKey(grade);const val={name,grade:normGrade(grade),price:Number(price),stock:stock||"",note:note||"",at:today(),del:false};
   for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const it=S.items.find(x=>x.id===id)||{};const p={quotes:{[key]:val}};
+    Object.entries(it.quotes||{}).forEach(([k,q])=>{if(k!==key&&q&&!q.del&&supKey(q.name||"")===supKey(name)&&normGrade(q.grade)===val.grade)p.quotes[k]={del:true}});
     const cur=Number(it.price);const old=(it.quotes||{})[key];if(!(cur>0)||val.price<=cur||(old&&!old.del&&it.supplier===name&&Number(old.price)===cur)){p.price=val.price;p.supplier=name;if(!it.source)p.source="supplier"}
     return S.db.doc("items/"+id).update(stamp(p))}));
   return key}
@@ -1398,7 +1401,7 @@ async function removeSupplierQuote(ids,key){
   for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const it=S.items.find(x=>x.id===id)||{};const q=(it.quotes||{})[key];const p={quotes:{[key]:{del:true}}};
     if(q&&it.supplier===q.name&&Number(it.price)===Number(q.price)){const rest=quotesOf(it).filter(x=>x.key!==key);if(rest.length){const b=rest.reduce((a,c)=>c.price<a.price?c:a);p.price=b.price;p.supplier=b.name}else{p.price="";}}
     return S.db.doc("items/"+id).update(stamp(p))}))}
-const GCOL={OEM:"--s-cari",GENUINE:"--s-tiba",ORIGINAL:"--s-beli",AFTERMARKET:"--s-po",KW:"--s-baru"};
+const GCOL={OEM:"--s-cari",GENUINE:"--s-tiba",ORIGINAL:"--s-beli",THAILAND:"--s-po",JEPANG:"--s-batal"};
 const gradePill=g=>{const k=normGrade(g);return `<span class="gp" style="--c:var(${GCOL[k]||(k?"--s-tawar":"--s-batal")})">${esc(k||"?")}</span>`};
 const gOrder=g=>{const i=GRADES.indexOf(g);return i<0?(g?50:99):i};
 const sortG=a=>[...a].sort((x,y)=>gOrder(x)-gOrder(y)||x.localeCompare(y));
@@ -1435,6 +1438,7 @@ function openPriceEditor(ids){
   const sug=c=>Math.round(c*(1+S.markup/100)/100)*100;
   // offer rows: one per grade (supplier grades + existing options)
   const O=new Map();(f.sellOpts||[]).forEach(o=>O.set(o.g,{d:o.d,l:o.l}));
+  const hasQ=g=>[...qmap.values()].some(q=>q.grade===g);
   const offerGrades=()=>sortG([...new Set([...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()])]);
   let pick="";
   const lo=f.part?partOcc(f.part).filter(o=>!ids.includes(o.id)).find(o=>o.offered!=null):null;
@@ -1455,7 +1459,7 @@ function openPriceEditor(ids){
         <button type="button" class="ink" id="pe_add">Simpan harga</button></div>
        <div class="sub" id="pe_hint"></div></div>`:""}
     </section>
-    <section class="pe-step"><div class="pe-h"><span class="pe-num">2</span><div><b>Harga tawar ke customer</b><div class="sub">${canSell?"Isi harga laut dan/atau udara per jenis. Kosongkan yang tidak ditawarkan.":"Diisi oleh pimpinan. Anda hanya bisa melihat."}</div></div></div>
+    <section class="pe-step"><div class="pe-h"><span class="pe-num">2</span><div><b>Harga tawar ke customer</b><div class="sub">${canSell?"Isi harga laut dan/atau udara per jenis. Klik ✕ untuk menghapus harga tawar suatu jenis.":"Diisi oleh pimpinan. Anda hanya bisa melihat."}</div></div></div>
      ${varied?`<div class="dupnote">Item dalam grup ini punya harga tawar berbeda. Menyimpan di sini akan menyamakan semuanya.</div>`:""}
      ${lo?`<div class="pe-last">Riwayat: ${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</div>`:""}
      ${(()=>{const rids=[...new Set(its.map(i=>i.rfqId))];const r=S.rfqs[rids[0]]||{};const l=Number(r.ongkirL)>0,u=Number(r.ongkirU)>0;
@@ -1483,7 +1487,7 @@ function openPriceEditor(ids){
        <span class="rpw"><span>Rp</span><input data-ol="${esc(g)}" inputmode="numeric" value="${o.l===""?"":fmtN(o.l)}" placeholder="${canSell?"laut":"—"}" ${dis}></span>
        <span class="r pe-cost">${costCell(g,"d")}</span>
        <span class="rpw"><span>Rp</span><input data-od="${esc(g)}" inputmode="numeric" value="${o.d===""?"":fmtN(o.d)}" placeholder="${canSell?"udara":"—"}" ${dis}></span>
-       <span class="r pe-mg" data-mg="${esc(g)}">${mgf(o.l,costM(g,"l"))}<span class="sub"> / </span>${mgf(o.d,costM(g,"d"))}</span></div>`}).join("")}</div>`;
+       <span class="r pe-mg"><span data-mg="${esc(g)}">${mgf(o.l,costM(g,"l"))}<span class="sub"> / </span>${mgf(o.d,costM(g,"d"))}</span>${canSell&&(o.l!==""||o.d!==""||!hasQ(g))?`<button type="button" class="ghost sm danger pe-odel" data-odel="${esc(g)}" title="Hapus harga tawar ${esc(g)}" aria-label="Hapus harga tawar ${esc(g)}">✕</button>`:""}</span></div>`}).join("")}</div>`;
     $("#pe_o").querySelectorAll("input").forEach(el=>{rpInput(el);el.addEventListener("input",()=>{const g=el.dataset.od??el.dataset.ol;const o=O.get(g)||{d:"",l:""};o[el.dataset.od!=null?"d":"l"]=rpVal(el.value);O.set(g,o);
       const m=$(`#pe_o [data-mg="${CSS.escape(g)}"]`);if(m)m.innerHTML=`${mgf(o.l,costM(g,"l"))}<span class="sub"> / </span>${mgf(o.d,costM(g,"d"))}`})})};
   drawQ();drawO();
@@ -1510,6 +1514,13 @@ function openPriceEditor(ids){
     const addG=g=>{g=normGrade(g);if(!g)return;if(!O.has(g))O.set(g,{d:"",l:""});drawO();const el=$(`#pe_o [data-ol="${CSS.escape(g)}"]`);if(el)el.focus()};
     $("#pe_addg").onchange=e=>{const g=e.target.value;e.target.value="";if(g==="*"){$("#pe_addo").hidden=false;$("#pe_addo").focus();return}addG(g)};
     $("#pe_addo").onchange=e=>{addG(e.target.value);e.target.value="";e.target.hidden=true};
+    $("#pe_o").addEventListener("click",async e=>{const b=e.target.closest("[data-odel]");if(!b)return;const g=b.dataset.odel;
+      if(S.oDel!==g){S.oDel=g;b.textContent="Hapus?";b.classList.add("armed");setTimeout(()=>{if(S.oDel===g){S.oDel=null;b.textContent="✕";b.classList.remove("armed")}},4000);return}S.oDel=null;
+      const saved=(f.sellOpts||[]).some(o=>o.g===g);const prev=O.get(g);
+      if(hasQ(g))O.set(g,{d:"",l:""});else O.delete(g);
+      if(!saved){drawO();return}
+      b.disabled=true;const opts=[...O.entries()].map(([gg,o])=>({g:gg,...o})).filter(o=>o.d!==""||o.l!=="");
+      if(await setSellOpts(ids,opts)){its.forEach(it=>{it.sellOpts=(it.sellOpts||[]).filter(o=>o.g!==g)});drawO();toast(`Harga tawar ${g} dihapus`)}else{if(prev)O.set(g,prev);drawO()}});
     $("#pe_fill").onclick=()=>{let n=0;offerGrades().forEach(g=>{const o=O.get(g)||{d:"",l:""};const cl=costM(g,"l"),cu=hasL(g,"d")?costM(g,"d"):null;
         if(o.l===""&&cl>0){o.l=sug(cl);n++}if(o.d===""&&cu>0){o.d=sug(cu);n++}O.set(g,o)});drawO();
       $("#pe_msg").textContent=n?`${n} harga diisi dari biaya (modal + ongkir) +${S.markup}%. Periksa, lalu Simpan.`:"Semua harga yang bisa dihitung sudah terisi."};
@@ -1758,7 +1769,7 @@ function openCpoView(id){const p=(S.cpos||{})[id];if(!p)return;
 
 
 /* PO customer tanpa RFQ: buat item otomatis supaya bisa dipesan ke supplier */
-const guessGrade=t=>{const m=String(t||"").toUpperCase().match(/\b(GENUINE|OEM|ORIGINAL|AFTERMARKET|KW)\b/);return m?m[1]:""};
+const guessGrade=t=>{const m=String(t||"").toUpperCase().match(/\b(GENUINE|OEM|ORIGINAL|THAILAND|JEPANG|JAPAN|AFTERMARKET|KW)\b/);return m?normGrade(m[1]==="JAPAN"?"JEPANG":m[1]):""};
 async function ensureCpoItems(cpoId){const p=(S.cpos||{})[cpoId];if(!p)return [];const lines=(p.lines||[]).map(l=>({...l}));
   const miss=lines.filter(l=>!l.itemId||!S.items.some(i=>i.id===l.itemId));if(!miss.length)return lines.map(l=>l.itemId);
   let rid=(p.rfqIds||[]).find(r=>S.rfqs[r]?.fromCpo===cpoId);const now=Date.now();

@@ -13,6 +13,8 @@
   const rid = () => { const a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; let s = ""; const r = crypto.getRandomValues(new Uint8Array(20)); for (const x of r) s += a[x % a.length]; return s; };
   const parentOf = (p) => p.split("/").slice(0, -1).join("/");
   const clone = (o) => (o == null ? o : JSON.parse(JSON.stringify(o)));
+  const isObj = (o) => o && typeof o === "object" && !Array.isArray(o);
+  const deepMerge = (a, b) => { if (!isObj(a) || !isObj(b)) return clone(b); const r = { ...a }; for (const [k, v] of Object.entries(b)) r[k] = isObj(v) && isObj(r[k]) ? deepMerge(r[k], v) : clone(v); return r; };
   const errOf = (e) => {
     const m = String(e?.message || e || "");
     if (e?.code === "42501" || /row-level security|forbidden|tidak boleh/i.test(m)) return Object.assign(new Error("Akun ini tidak punya izin untuk perubahan ini."), { code: "invalid_argument" });
@@ -125,7 +127,7 @@
         const p = clone(patch);
         if (isGudang()) { const { error } = await sb.rpc("gudang_receive", { p: path, patch: p }); if (error) throw errOf(error); }
         else { const { error } = await sb.rpc("doc_update", { p: path, patch: p }); if (error) throw errOf(error); }
-        const cur = getLocal(path); applyLocal(path, { ...(cur || {}), ...p });
+        const cur = getLocal(path); applyLocal(path, deepMerge(cur || {}, p));
       },
       async delete() { if (isGudang()) throw errOf({ code: "42501" }); const { error } = await sb.from("docs").delete().eq("path", path); if (error) throw errOf(error); applyLocal(path, null); },
       onSnapshot(cb, onErr) {
