@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124140322"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124141936"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -713,10 +713,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124140322">
-<script src="config.js?v=20261124140322"></script>
+<link rel="stylesheet" href="supa.css?v=20261124141936">
+<script src="config.js?v=20261124141936"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124140322"></script>
+<script src="supa.js?v=20261124141936"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1111,6 +1111,16 @@ const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","De
 const fmtEn=n=>(n===""||n==null||isNaN(n))?"":Number(n).toLocaleString("en-US");
 const dShort=s=>fmtD(s);
 const custKey=n=>supKey(n);
+/* data perusahaan customer: disimpan dari quotation, dicari lewat nama di RFQ (singkatan) atau nama PT lengkap */
+const CUST_F=["name","address","country","phone","attn","cc"];
+function findCust(n){const k=custKey(n);if(!n)return null;const C=S.customers||{};
+  if(C[k]&&C[k].name)return C[k];
+  const hit=Object.values(C).find(c=>c&&(c.aliases||[]).includes(k));if(hit)return hit;
+  // data lama: ambil dari quotation terakhir yang dibuat dari RFQ customer ini
+  const qs=Object.values(S.quotes||{}).filter(q=>q.d&&q.d.name&&(q.rfqIds||[]).some(id=>custKey(S.rfqs[id]?.customer||"")===k)).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
+  if(qs.length){const d=qs[0].d;const full=C[custKey(d.name)];return full||Object.fromEntries(CUST_F.map(f=>[f,d[f]||""]))}
+  return null}
+const custList=()=>Object.values(S.customers||{}).filter(c=>c&&c.name).sort((a,b)=>a.name.localeCompare(b.name));
 function nextQNo(){const c=qc();const d=new Date();return `${(Number(c.qCounter)||0)+1}/SMM-QUOT/${ROM[d.getMonth()]}/${d.getFullYear()}`}
 let Q=null;
 function openQuote(ids,qid){
@@ -1118,7 +1128,7 @@ function openQuote(ids,qid){
   const its=ids.map(id=>S.items.find(i=>i.id===id)).filter(i=>i&&i.status!=="batal");
   if(!its.length){toast("Pilih item untuk penawaran");return}
   const rfqIds=[...new Set(its.map(i=>i.rfqId))];const rs=rfqIds.map(id=>S.rfqs[id]).filter(Boolean);
-  const custs=[...new Set(rs.map(r=>r.customer).filter(Boolean))];const cust=custs[0]||"";const cp=(S.customers||{})[custKey(cust)]||{};
+  const custs=[...new Set(rs.map(r=>r.customer).filter(Boolean))];const cust=custs[0]||"";const cp=findCust(cust)||{};
   its.sort((a,b)=>rfqIds.indexOf(a.rfqId)-rfqIds.indexOf(b.rfqId)||(a.line||0)-(b.line||0));
   Q={rfqIds,rows:its.flatMap(quoteRowsFor),mode:lastQMode()};
   const c=qc();const f=(id,label,val,extra="")=>`<label class="f">${label}<input id="${id}" value="${esc(val??"")}" ${extra}></label>`;
@@ -1132,7 +1142,7 @@ function openQuote(ids,qid){
      <label class="f">Ongkir udara (total)<span class="rpw"><span>Rp</span><input id="q_fu" inputmode="numeric" value="${(()=>{const v=rs.reduce((t,r)=>t+(Number(r.ongkirU)||0),0);return v>0?fmtN(v):""})()}" placeholder="0"></span></label>
      <div class="sub" id="q_frinfo" style="grid-column:span 2;align-self:end"></div></div>
     <div class="sec">To</div>
-    <div class="g4">${f("q_name","Name",cp.name||cust)}${f("q_address","Address",cp.address)}${f("q_country","Country",cp.country)}${f("q_phone","Phone",cp.phone)}${f("q_attn","Attn.",cp.attn)}${f("q_cc","CC",cp.cc)}</div>
+    <div class="g4">${f("q_name","Name (nama PT lengkap)",cp.name||cust,'list="dlCust" autocomplete="off"')}<datalist id="dlCust">${custList().map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist>${f("q_address","Address",cp.address)}${f("q_country","Country",cp.country)}${f("q_phone","Phone",cp.phone)}${f("q_attn","Attn.",cp.attn)}${f("q_cc","CC",cp.cc)}</div>
     <div class="bar"><span class="sub">Baris dikelompokkan per unit (judul tebal di PDF). OEM dan Genuine tampil sebagai baris terpisah; klik <b>+ jenis</b> untuk menambah baris jenis lain dari part yang sama. Kolom Brand menentukan jenis.</span><span class="sub" id="q_warn"></span></div>
     <div class="qmode"><span class="qm-l">Harga yang ditawarkan</span><div class="seg qm-seg" role="radiogroup" aria-label="Harga yang ditawarkan"><button type="button" data-qm="l">Laut saja</button><button type="button" data-qm="u">Udara saja</button><button type="button" data-qm="lu">Laut &amp; Udara</button></div></div>
     <div id="q_tbl"></div>
@@ -1156,6 +1166,7 @@ function openQuote(ids,qid){
     $("#q_fl").closest("label").hidden=m==="u";$("#q_fu").closest("label").hidden=m==="l";$("#q_tbl").innerHTML="";renderQuoteTbl();frInfo()};
   document.querySelectorAll("[data-qm]").forEach(b=>b.onclick=()=>setQM(b.dataset.qm));setQM(Q.mode);
   $("#s_save").onclick=saveQuoteDefaults;
+  $("#q_name").addEventListener("change",()=>{const c=findCust($("#q_name").value.trim());if(!c)return;["address","country","phone","attn","cc"].forEach(k=>{if(c[k]!=null&&$("#q_"+k))$("#q_"+k).value=c[k]});if(c.name)$("#q_name").value=c.name;toast("Data perusahaan "+c.name+" diisi otomatis")});
   $("#q_draftpdf").onclick=()=>{const d=quoteData();downloadQuote({no:d.no,d},false)};
   $("#q_draftxls").onclick=()=>{const d=quoteData();downloadQuote({no:d.no,d},false,"xlsx")};
   $("#q_submit").onclick=async()=>{const b=$("#q_submit");b.disabled=true;const r=await submitQuote(S.isApprover);b.disabled=false;if(!r)return;closeOverlay();S.tab="quotes";S.qFilter="";render();
@@ -2263,7 +2274,8 @@ async function submitQuote(asApprover){
   try{await S.db.doc("quotes/"+id).set(rec);
     const c=qc();const seq=Number((d.no.match(/^\s*(\d+)/)||[])[1]);if(seq&&seq>(Number(c.qCounter)||0))await S.db.doc("settings/company").set({...(S.settings||{}),qCounter:seq});
     if(Q.rfqIds.length===1&&S.rfqs[Q.rfqIds[0]]){const r=S.rfqs[Q.rfqIds[0]];if(String(r.ongkirL??"")!==String(d.fl)||String(r.ongkirU??"")!==String(d.fu))await S.db.doc("rfqs/"+Q.rfqIds[0]).update({ongkirL:d.fl,ongkirU:d.fu,updatedAt:now})}
-    if(d.name)await S.db.doc("customers/"+custKey(d.name)).set({name:d.name,address:d.address,country:d.country,phone:d.phone,attn:d.attn,cc:d.cc,updatedAt:now});
+    if(d.name){const k=custKey(d.name);const old=(S.customers||{})[k]||{};const al=new Set(old.aliases||[]);(Q.rfqIds||[]).forEach(id=>{const c=S.rfqs[id]?.customer;if(c&&custKey(c)!==k)al.add(custKey(c))});
+      await S.db.doc("customers/"+k).set({name:d.name,address:d.address,country:d.country,phone:d.phone,attn:d.attn,cc:d.cc,aliases:[...al],updatedAt:now})}
     const ups=[...new Set(d.rows.map(r=>r.id))].map(iid=>{const rs=d.rows.filter(r=>r.id===iid);const p={quoteNo:d.no,quotedAt:d.date,quoteId:id};if(rs.length===1&&rs[0].brand)p.brand=rs[0].brand;return [iid,p]});
     for(let i=0;i<ups.length;i+=8)await Promise.all(ups.slice(i,i+8).map(([iid,p])=>S.db.doc("items/"+iid).update(stamp(p))));
     if(asApprover){await approveQuote({id,...rec},"");return {id,rec}}
