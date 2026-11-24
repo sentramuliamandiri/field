@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124113437"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124124724"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -707,10 +707,10 @@ a{color:var(--ink)}
 <div id="overlay"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124113437">
-<script src="config.js?v=20261124113437"></script>
+<link rel="stylesheet" href="supa.css?v=20261124124724">
+<script src="config.js?v=20261124124724"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124113437"></script>
+<script src="supa.js?v=20261124124724"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1135,7 +1135,7 @@ function openQuote(ids,qid){
       <label class="toggle" style="align-self:end"><input type="checkbox" id="q_sig" ${c.sig!==false?"checked":""}> Sertakan tanda tangan & cap</label>
       <div class="bar" style="align-self:end"><button type="button" id="s_save">Simpan sebagai default</button></div></div></details>
    </div>
-   <div class="df"><span class="sub" id="q_sum" style="margin-right:auto"></span><button type="button" data-close="1">Tutup</button><button type="button" id="q_draftpdf">PDF draft</button><button type="button" class="primary" id="q_submit">${S.isApprover?"Setujui & unduh PDF":"Ajukan ke pimpinan"}</button></div></div></div>`;
+   <div class="df"><span class="sub" id="q_sum" style="margin-right:auto"></span><button type="button" data-close="1">Tutup</button><button type="button" id="q_draftpdf">PDF draft</button><button type="button" id="q_draftxls">Excel draft</button><button type="button" class="primary" id="q_submit">${S.isApprover?"Setujui & unduh PDF":"Ajukan ke pimpinan"}</button></div></div></div>`;
   renderQuoteTbl();
   Q.editId=eq?qid:null;
   if(eq){const d=qData(eq);for(const k of ["no","date","name","address","country","phone","attn","cc","priceTerms","deliveryTime","validityQ","paymentTerms","vat","signer"])if($("#q_"+k)&&d[k]!=null)$("#q_"+k).value=d[k];
@@ -1149,6 +1149,7 @@ function openQuote(ids,qid){
   document.querySelectorAll("[data-qm]").forEach(b=>b.onclick=()=>setQM(b.dataset.qm));setQM(Q.mode);
   $("#s_save").onclick=saveQuoteDefaults;
   $("#q_draftpdf").onclick=()=>{const d=quoteData();downloadQuote({no:d.no,d},false)};
+  $("#q_draftxls").onclick=()=>{const d=quoteData();downloadQuote({no:d.no,d},false,"xlsx")};
   $("#q_submit").onclick=async()=>{const b=$("#q_submit");b.disabled=true;const r=await submitQuote(S.isApprover);b.disabled=false;if(!r)return;closeOverlay();S.tab="quotes";S.qFilter="";render();
     if(S.isApprover){toast(`Quotation ${r.rec.no} disetujui`);downloadQuote({id:r.id,...r.rec},true)}
     else{const t=$("#toast");t.innerHTML=`Diajukan ke pimpinan. <a class="btn sm undo" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(notifyText({id:r.id,...r.rec}))}">Kabari via WA</a>`;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,10000)}};
@@ -1250,6 +1251,59 @@ async function quotePdf(d,approved){
   if(d.sig&&approved)doc.addImage("data:image/png;base64,"+A.ttd,"PNG",34,y,95,28);y+=36;F("bold",7.2);T(d.signer,34,y+BASE);
   if(!approved){const n=doc.getNumberOfPages();for(let pg=1;pg<=n;pg++){doc.setPage(pg);doc.saveGraphicsState();doc.setGState(new doc.GState({opacity:.13}));doc.setTextColor(200,0,0);F("bold",64);doc.text("DRAFT",306,430,{align:"center",angle:30});F("bold",14);doc.text("MENUNGGU PERSETUJUAN",306,470,{align:"center",angle:30});doc.restoreGraphicsState();doc.setTextColor(0)}}
   return doc.output("blob");
+}
+
+const XLSX_LIB="vendor/exceljs.min.js";
+async function quoteXlsx(d,approved){
+  await loadScript(XLSX_LIB);const A=await quoteAssets();const wb=new window.ExcelJS.Workbook();wb.creator="PT. Sentra Mulia Mandiri";
+  const ws=wb.addWorksheet(approved?"Quotation":"DRAFT",{pageSetup:{paperSize:1,orientation:"portrait",fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:.4,right:.4,top:.5,bottom:.5,header:.2,footer:.2}},views:[{showGridLines:false}]});
+  ws.columns=[{width:9},{width:46},{width:7},{width:8},{width:16},{width:16},{width:14}];
+  const DL=isDL(d);const NF="#,##0";const thin={style:"thin",color:{argb:"FF000000"}};const box={top:thin,left:thin,bottom:thin,right:thin};
+  const F=(c,o={})=>{c.font={name:"Calibri",size:o.sz||10,bold:!!o.b,underline:!!o.u,color:{argb:o.red?"FFC00000":"FF000000"}}};
+  const put=(addr,v,o={})=>{const c=ws.getCell(addr);c.value=v??"";F(c,o);c.alignment={vertical:"middle",horizontal:o.al||"left",wrapText:!!o.wrap};if(o.ul)c.border={bottom:thin};return c};
+  const ul=(r,a,b)=>{for(let k=a;k<=b;k++)ws.getCell(r,k).border={...(ws.getCell(r,k).border||{}),bottom:thin}};
+  // header: kop + quotation box
+  for(let r=1;r<=5;r++)ws.getRow(r).height=14;
+  ws.addImage(wb.addImage({base64:A.kop,extension:"jpeg"}),{tl:{col:0,row:0},ext:{width:470,height:70},editAs:"oneCell"});
+  ws.mergeCells("E1:G1");put("E1","QUOTATION",{b:true,u:true,al:"center"});
+  put("E2","NUMBER:",{u:true});ws.mergeCells("E3:G3");put("E3",d.no,{al:"center"});
+  put("E4","DATE:",{u:true});ws.mergeCells("E5:G5");put("E5",dShort(d.date),{al:"center"});
+  for(let r=1;r<=5;r++)ws.getCell(r,5).border={...(ws.getCell(r,5).border||{}),left:thin};ul(5,1,7);
+  // TO block
+  put("A7","TO :",{b:true});ws.getCell("A7").border=box;
+  const kv=(r,k,v,al)=>{put("A"+r,k);ws.mergeCells(`B${r}:G${r}`);put("B"+r,v,{al});ul(r,2,7)};
+  kv(8,"Name",d.name);kv(9,"Address",d.address);
+  const kv2=(r,k,v,k2,v2,b2)=>{put("A"+r,k);put("B"+r,v);ws.mergeCells(`C${r}:D${r}`);put("E"+r,k2,{b:b2});ws.mergeCells(`F${r}:G${r}`);put("F"+r,v2);ul(r,2,7)};
+  kv2(10,"Country",d.country,"RFQ Ref.",d.rfqRef,true);kv2(11,"Phone",d.phone,"RFQ Date",d.rfqDate,true);kv2(12,"Attn.",d.attn,"CC",d.cc,false);
+  put("A14","Dear Sir/Madam,");put("A15","We thank you for your recent enquiry and have the pleasure to submit herewith our quotation for");put("A16","your consideration");
+  let r=17;
+  if(!approved){ws.mergeCells(`A${r}:G${r}`);put("A"+r,"DRAFT – MENUNGGU PERSETUJUAN PIMPINAN",{b:true,red:true,al:"center"});r++}
+  r++;
+  const hd=["NO","DESCRIPTION","QTY","UNIT",DL?"Harga Laut (Rp)":"Unit Price (Rp)",DL?"Harga Udara (Rp)":"Total Price (Rp)","Brand"];
+  hd.forEach((t,k)=>{const c=ws.getCell(r,k+1);c.value=t;F(c,{b:true});c.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FF538DD5"}};c.alignment={horizontal:"center",vertical:"middle",wrapText:true};c.border=box});
+  ws.getRow(r).height=18;const hRow=r;r++;
+  const cellB=(rr)=>{for(let k=1;k<=7;k++)ws.getCell(rr,k).border=box};
+  const num=(rr,col,v)=>{const c=ws.getCell(rr,col);if(v===""||v==null){c.value="-";c.alignment={horizontal:"right"}}else{c.value=Number(v);c.numFmt=NF;c.alignment={horizontal:"right",vertical:"top"}}F(c)};
+  const first=r;
+  qGroups(d.rows).forEach(g=>{
+    if(g.name){cellB(r);put("B"+r,g.name,{b:true,wrap:true});r++}
+    g.rows.forEach((x,i)=>{cellB(r);put("A"+r,i+1,{al:"center"});put("B"+r,x.desc,{wrap:true});ws.getCell("A"+r).alignment={horizontal:"center",vertical:"top"};ws.getCell("B"+r).alignment={wrapText:true,vertical:"top"};
+      const q=ws.getCell("C"+r);q.value=Number(x.qty)||0;q.numFmt=NF;q.alignment={horizontal:"center",vertical:"top"};F(q);put("D"+r,x.unit,{al:"center"});ws.getCell("D"+r).alignment={horizontal:"center",vertical:"top"};
+      if(DL){const p=rowDL(x);num(r,5,p.l);num(r,6,p.d)}
+      else if(x.price!==""&&x.price!=null){num(r,5,x.price);const t=ws.getCell("F"+r);t.value={formula:`C${r}*E${r}`,result:(Number(x.price)||0)*(Number(x.qty)||0)};t.numFmt=NF;t.alignment={horizontal:"right",vertical:"top"};F(t)}
+      else{num(r,5,"");num(r,6,"")}
+      put("G"+r,x.brand||"",{al:"center"});ws.getCell("G"+r).alignment={horizontal:"center",vertical:"top"};
+      const ln=Math.max(1,Math.ceil(String(x.desc||"").length/62));if(ln>1)ws.getRow(r).height=14*ln;r++});
+    cellB(r);r++});
+  if(!DL){const tot=d.rows.reduce((s,x)=>s+(Number(x.price)||0)*(Number(x.qty)||0),0);ws.mergeCells(`A${r}:E${r}`);put("A"+r,"TOTAL",{b:true,al:"right"});const t=ws.getCell("F"+r);t.value={formula:`SUM(F${first}:F${r-1})`,result:tot};t.numFmt=NF;F(t,{b:true});t.alignment={horizontal:"right"};for(let k=1;k<=7;k++)ws.getCell(r,k).border=box;r++}
+  r++;
+  put("A"+r,"Terms & Conditions :",{b:true});r++;
+  [["Price Terms",d.priceTerms],["Delivery Time",d.deliveryTime],["Validity of Quotation",d.validityQ],["Payment Terms",d.paymentTerms],["VAT",d.vat]].forEach(([k,v])=>{ws.mergeCells(`A${r}:B${r}`);put("A"+r,k);ws.mergeCells(`C${r}:G${r}`);put("C"+r,v||"");ul(r,3,7);r++});
+  r+=2;["If you have any other queries, please feel free to contact us.","We hope our quotation meets your requirements, and we look forward to hearing good news from you.","Thank You.","Best Regards,"].forEach(t=>{put("A"+r,t);r++});
+  if(d.sig!==false&&approved&&A.ttd){ws.addImage(wb.addImage({base64:A.ttd,extension:"png"}),{tl:{col:0.1,row:r-1+0.2},ext:{width:130,height:38},editAs:"oneCell"})}
+  r+=3;put("A"+r,d.signer||"",{b:true});
+  ws.pageSetup.printArea=`A1:G${r}`;ws.pageSetup.printTitlesRow=`${hRow}:${hRow}`;
+  const buf=await wb.xlsx.writeBuffer();return new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
 
 /* --- 4. record customer PO outcome --- */
@@ -2046,12 +2100,12 @@ function openQuoteView(qid){
   const btn=(attr,label,cls="")=>`<button type="button" class="${cls}" ${attr}>${label}</button>`;
   const acts=[];
   if(st==="approved"&&canW())acts.push(btn(`data-cpoup="${qid}"`,"PO customer masuk","ink"));
-  if(st==="approved")acts.push(btn(`data-qpdf="${qid}"`,"Unduh PDF","primary"),btn(`data-qwa="${qid}"`,"Salin untuk WA"),btn(`data-qpo="${qid}"`,"Catat hasil PO"));
+  if(st==="approved")acts.push(btn(`data-qpdf="${qid}"`,"Unduh PDF","primary"),btn(`data-qxls="${qid}"`,"Unduh Excel","primary"),btn(`data-qwa="${qid}"`,"Salin untuk WA"),btn(`data-qpo="${qid}"`,"Catat hasil PO"));
   if(st==="pending"&&S.isApprover)acts.push(btn(`data-qreview="${qid}"`,"Tinjau & isi harga","primary"));
   if(st==="pending"&&!S.isApprover)acts.push(btn(`data-qnotify="${qid}"`,"Kabari pimpinan"));
   if(["pending","revision","draft"].includes(st)&&canW())acts.push(btn(`data-qedit="${qid}"`,st==="revision"?"Perbaiki":"Ubah"));
   if(st==="legacy"&&canW())acts.push(btn(`data-qedit="${qid}"`,"Ajukan ulang ke pimpinan","primary"));
-  if(st!=="approved")acts.push(btn(`data-qdraft="${qid}"`,"PDF draft","ghost"));
+  if(st!=="approved")acts.push(btn(`data-qdraft="${qid}"`,"PDF draft","ghost"),btn(`data-qdraftx="${qid}"`,"Excel draft","ghost"));
   if(st!=="approved"&&canW())acts.push(btn(`data-qdel="${qid}"`,"Hapus","ghost danger"));
   $("#overlay").innerHTML=`<div class="scrim" data-close="1"></div><div class="modal"><div class="box" style="width:min(900px,100%)" role="dialog" aria-label="Quotation">
    <div class="dh"><div><h2 class="pn" style="font-size:18px">${esc(q.no)}</h2><div class="sub">${esc(d.name)} · ${(d.rows||[]).length} baris · total${isDL(d)?" laut":qMode(d)==="u"?" udara":qMode(d)==="l"?" laut":""} ${rp(tot)}</div></div>
@@ -2093,7 +2147,7 @@ function renderQuoteView(){
       <td class="qa"><button type="button" class="sm" data-qview="${x.id}">Lihat</button> ${st==="legacy"?(canW()?`<button type="button" class="sm danger" data-qdel="${x.id}">Hapus</button>`:""):`${st==="pending"&&S.isApprover?`<button type="button" class="sm primary" data-qreview="${x.id}">Tinjau</button>`:""}
         ${st==="pending"&&!S.isApprover?`<button type="button" class="sm" data-qnotify="${x.id}">Kabari pimpinan</button>`:""}
         ${st!=="approved"&&canW()?`<button type="button" class="sm" data-qedit="${x.id}">${st==="revision"?"Perbaiki":"Ubah"}</button>`:""}
-        ${st==="approved"?`<button type="button" class="sm primary" data-qpdf="${x.id}">Unduh PDF</button><button type="button" class="sm" data-qwa="${x.id}">Salin WA</button><button type="button" class="sm" data-qpo="${x.id}">Hasil PO</button>`:`<button type="button" class="sm ghost" data-qdraft="${x.id}">PDF draft</button>`}${st!=="approved"&&canW()?`<button type="button" class="sm ghost danger" data-qdel="${x.id}" title="Hapus quotation">Hapus</button>`:""}`}</td></tr>`}).join("")}</tbody></table></div>`
+        ${st==="approved"?`<button type="button" class="sm primary" data-qpdf="${x.id}">PDF</button><button type="button" class="sm primary" data-qxls="${x.id}">Excel</button><button type="button" class="sm" data-qwa="${x.id}">Salin WA</button><button type="button" class="sm" data-qpo="${x.id}">Hasil PO</button>`:`<button type="button" class="sm ghost" data-qdraft="${x.id}">PDF draft</button><button type="button" class="sm ghost" data-qdraftx="${x.id}">Excel draft</button>`}${st!=="approved"&&canW()?`<button type="button" class="sm ghost danger" data-qdel="${x.id}" title="Hapus quotation">Hapus</button>`:""}`}</td></tr>`}).join("")}</tbody></table></div>`
    :`<div class="tbl-wrap"><div class="empty"><h3>Belum ada quotation${S.qFilter?" dengan status ini":""}</h3><p>Buat quotation dari tombol <b>Quotation</b> di baris RFQ, atau centang item lalu <b>Buat quotation</b>.</p></div></div>`);
 }
 async function submitQuote(asApprover){
@@ -2124,11 +2178,12 @@ async function approveQuote(q,note,prices){
     for(let i=0;i<rows.length;i+=8)await Promise.all(rows.slice(i,i+8).map(r=>{const it=S.items.find(x=>x.id===r.id);if(!it)return null;const p={};if(["baru","cari"].includes(it.status))p.status="tawar";return Object.keys(p).length?S.db.doc("items/"+r.id).update(stamp(p)):null}));
     return true}catch(e){if(e?.code==="invalid_argument")toast("Persetujuan tidak tersimpan: akun ini belum ditunjuk sebagai penyetuju oleh pemilik.");else fail(e);return false}
 }
-async function downloadQuote(q,approved){
+async function downloadQuote(q,approved,fmt){const X=fmt==="xlsx";
   const a=q.id?(S.approvals||{})[q.id]:null;const d=approved&&a?.snapshot&&a.submittedAt===q.submittedAt?a.snapshot:(q.d||qData(q));
-  try{const blob=await quotePdf(d,approved);const dl=S.downloads;if(!dl){toast("Unduhan tidak tersedia di tampilan ini");return}
-    await dl.save({filename:`${approved?"Quotation":"DRAFT Quotation"}_${String(q.no).split("/")[0]}_${d.name||""}.pdf`.replace(/[\\/:*?"<>|]+/g," ").slice(0,200),data:blob})}
-  catch(e){if(e?.code!=="declined"){diag("quote-pdf-fail",errInfo(e));toast(e?.code?`Unduh gagal (${e.code})`:String(e?.message||"PDF gagal dibuat"))}}
+  try{const dl=S.downloads;if(!dl){toast("Unduhan tidak tersedia di tampilan ini");return}if(X)toast("Menyiapkan file Excel…");
+    const blob=X?await quoteXlsx(d,approved):await quotePdf(d,approved);
+    await dl.save({filename:`${approved?"Quotation":"DRAFT Quotation"}_${String(q.no).split("/")[0]}_${d.name||""}`.replace(/[\\/:*?"<>|]+/g," ").slice(0,190)+(X?".xlsx":".pdf"),data:blob})}
+  catch(e){if(e?.code!=="declined"){diag(X?"quote-xlsx-fail":"quote-pdf-fail",errInfo(e));toast(e?.code?`Unduh gagal (${e.code})`:String(e?.message||(X?"Excel gagal dibuat":"PDF gagal dibuat")))}}
 }
 function openReview(qid){
   const q=(S.quotes||{})[qid];if(!q)return;const rows=q.d?.rows||[];const QC=quoteCostFn(q.d);const CM=QC.fn;const QM=["l","u"].includes(q.d?.mode)?q.d.mode:"lu";const RC=QM==="lu"?8:7;
@@ -2149,7 +2204,7 @@ function openReview(qid){
     <div class="bar"><span id="rTot"></span><span class="sub">Terms: ${esc([q.d?.priceTerms,q.d?.deliveryTime,q.d?.validityQ,q.d?.paymentTerms,q.d?.vat].filter(Boolean).join(" · "))}</span></div>
     <label class="f">Catatan untuk admin (wajib jika minta revisi)<textarea id="r_note" rows="2" style="font-family:var(--f-body);font-size:14px" placeholder="mis. harga item no. 2 terlalu tinggi, turunkan ke 210.000"></textarea></label>
    </div>
-   <div class="df"><button type="button" class="ghost" id="r_draft" style="margin-right:auto">Lihat PDF draft</button><button type="button" class="danger" id="r_rev">Minta revisi</button><button type="button" class="primary" id="r_ok">Setujui</button></div></div></div>`;
+   <div class="df"><button type="button" class="ghost" id="r_draft" style="margin-right:auto">Lihat PDF draft</button><button type="button" class="ghost" id="r_draftx">Excel draft</button><button type="button" class="danger" id="r_rev">Minta revisi</button><button type="button" class="primary" id="r_ok">Setujui</button></div></div></div>`;
   const mgs=(v,c)=>c>0&&Number(v)>0?`<span class="mg ${v<c?"neg":""}" style="display:inline">${((v-c)/v*100).toFixed(1).replace(".",",")}%</span>`:"—";
   const recalc=()=>{let tot=0,cost=0,miss=0;rows.forEach((r,k)=>{const it=S.items.find(x=>x.id===r.id)||{};const cl=CM(it,rowGrade(r),"l"),cu=CM(it,rowGrade(r),"d");const p=P[k];const useL=QM==="l"||(QM==="lu"&&p.l!=="");const c=useL?cl:cu;const q2=Number(r.qty)||0;const pr=QM==="l"?p.l:QM==="u"?p.d:(p.l!==""?p.l:p.d);
       if(pr===""||pr==null)miss++;else{tot+=pr*q2;if(c>0)cost+=c*q2}
@@ -2163,13 +2218,14 @@ function openReview(qid){
   if($("#rFill"))$("#rFill").onclick=()=>{rows.forEach((r,k)=>{if(P[k].d===""&&P[k].l===""){const lo=lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id);if(lo){const fk=QM==="u"?"d":"l";P[k][fk]=lo.offered;const el=document.querySelector(fk==="d"?`[data-rd="${k}"]`:`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k][fk])}}});$("#rFill").remove();recalc();toast(`Harga terakhir diisi ke kolom ${QM==="u"?"udara":"laut"}. Periksa jenis barang dan item yang dulu tidak diorder.`)};
   document.querySelectorAll("[data-rd],[data-rl]").forEach(el=>el.addEventListener("change",()=>{const v=el.value.trim()===""?"":parsePrice(el.value);if(v===null){toast("Format harga tidak dikenali");return}const k=+(el.dataset.rd??el.dataset.rl);P[k][el.dataset.rd!=null?"d":"l"]=v;el.value=v===""?"":fmtN(v);recalc()}));
   $("#r_draft").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false);
+  $("#r_draftx").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false,"xlsx");
   $("#r_rev").onclick=async()=>{const note=$("#r_note").value.trim();if(!note){toast("Tulis catatan revisi untuk admin");$("#r_note").focus();return}
     try{await saveOptsFromRows(withP());
       await S.db.doc(`appr/${S.myId}/q/${q.id}`).set({status:"revision",note,by:S.myId||"",at:Date.now(),submittedAt:q.submittedAt});closeOverlay();toast("Dikembalikan ke admin untuk revisi")}
     catch(e){if(e?.code==="invalid_argument")toast("Tidak tersimpan: akun ini belum ditunjuk sebagai penyetuju.");else fail(e)}};
   $("#r_ok").onclick=async()=>{const miss=recalc();if(miss&&!S.revMissOk){S.revMissOk=true;toast(`${miss} baris belum ada harga tawar. Klik Setujui sekali lagi untuk tetap menyetujui.`);return}S.revMissOk=false;
     const b=$("#r_ok");b.disabled=true;if(await approveQuote(q,$("#r_note").value.trim(),P)){closeOverlay();toast(`Quotation ${q.no} disetujui`);
-      const t=$("#toast");t.innerHTML=`Quotation ${esc(q.no)} disetujui <button type="button" class="undo" id="dlNow">Unduh PDF</button>`;t.hidden=false;clearTimeout(toast.h);$("#dlNow").onclick=()=>{t.hidden=true;downloadQuote({...q},true)};toast.h=setTimeout(()=>t.hidden=true,9000)}
+      const t=$("#toast");t.innerHTML=`Quotation ${esc(q.no)} disetujui <button type="button" class="undo" id="dlNow">Unduh PDF</button> <button type="button" class="undo" id="dlNowX">Unduh Excel</button>`;t.hidden=false;clearTimeout(toast.h);$("#dlNow").onclick=()=>{t.hidden=true;downloadQuote({...q},true)};$("#dlNowX").onclick=()=>{t.hidden=true;downloadQuote({...q},true,"xlsx")};toast.h=setTimeout(()=>t.hidden=true,9000)}
     else b.disabled=false};
 }
 function notifyText(q){return `Pak Benny, mohon persetujuan quotation *${q.no}* untuk *${q.d?.name||""}* (${(q.d?.rows||[]).length} item, total ${rp(qTotal(q))}).\nSilakan buka aplikasi Tracking Pengadaan → tab *Quotation* → Tinjau.\nTerima kasih.`}
@@ -2790,6 +2846,8 @@ document.addEventListener("click",e=>{
   if(t.dataset.qedit){openQuote([],t.dataset.qedit);return}
   if(t.dataset.qpdf){const q=S.quotes[t.dataset.qpdf];if(q)downloadQuote(q,true);return}
   if(t.dataset.qdraft){const q=S.quotes[t.dataset.qdraft];if(q)downloadQuote(q,false);return}
+  if(t.dataset.qxls){const q=S.quotes[t.dataset.qxls];if(q)downloadQuote(q,true,"xlsx");return}
+  if(t.dataset.qdraftx){const q=S.quotes[t.dataset.qdraftx];if(q)downloadQuote(q,false,"xlsx");return}
   if(t.dataset.qwa){const q0=S.quotes[t.dataset.qwa];const a=q0&&S.approvals[q0.id];const q=q0&&{...q0,d:qData(q0)};if(q)copyText(quoteWaText({...q.d,rows:(q.d.rows||[]).map(r=>({...r,total:(Number(r.price)||0)*(Number(r.qty)||0)}))}),"Teks quotation disalin. Tempel di WhatsApp customer.");return}
   if(t.dataset.qpo){const q=S.quotes[t.dataset.qpo];if(q)openOutcome((qData(q).rows||[]).map(r=>r.id));return}
   if(t.dataset.qnotify){const q=S.quotes[t.dataset.qnotify];if(q)copyText(notifyText(q),"Pesan untuk pimpinan disalin. Tempel di WhatsApp.");return}
