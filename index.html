@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124141936"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124143924"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -713,10 +713,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124141936">
-<script src="config.js?v=20261124141936"></script>
+<link rel="stylesheet" href="supa.css?v=20261124143924">
+<script src="config.js?v=20261124143924"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124141936"></script>
+<script src="supa.js?v=20261124143924"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1123,7 +1123,10 @@ function findCust(n){const k=custKey(n);if(!n)return null;const C=S.customers||{
 const custList=()=>Object.values(S.customers||{}).filter(c=>c&&c.name).sort((a,b)=>a.name.localeCompare(b.name));
 function nextQNo(){const c=qc();const d=new Date();return `${(Number(c.qCounter)||0)+1}/SMM-QUOT/${ROM[d.getMonth()]}/${d.getFullYear()}`}
 let Q=null;
-function openQuote(ids,qid){
+function openQuote(ids,qid,opt={}){
+  if(!qid&&!opt.fresh){const want=new Set(ids.filter(id=>{const i=S.items.find(x=>x.id===id);return i&&i.status!=="batal"}));
+    const ex=want.size?Object.values(S.quotes||{}).filter(q=>q.d&&(q.d.rows||[]).length&&[...want].every(id=>(q.d.rows||[]).some(r=>r.id===id))).sort((a,b)=>(b.submittedAt||b.createdAt||0)-(a.submittedAt||a.createdAt||0))[0]:null;
+    if(ex){openQuote([],ex.id,{fromIds:ids});return}}
   const eq=qid?(S.quotes||{})[qid]:null;if(eq)ids=(qData(eq).rows||[]).map(r=>r.id);
   const its=ids.map(id=>S.items.find(i=>i.id===id)).filter(i=>i&&i.status!=="batal");
   if(!its.length){toast("Pilih item untuk penawaran");return}
@@ -1159,6 +1162,8 @@ function openQuote(ids,qid){
     $("#q_rfqref").value=d.rfqRef||"";$("#q_rfqdate").value=d.rfqDate||"";if(d.fl!==undefined)$("#q_fl").value=Number(d.fl)>0?fmtN(d.fl):"";if(d.fu!==undefined)$("#q_fu").value=Number(d.fu)>0?fmtN(d.fu):"";$("#q_sig").checked=d.sig!==false;
     Q.mode=["l","u","lu"].includes(d.mode)?d.mode:"lu";
     Q.rows=(d.rows||[]).map(r=>{const it=S.items.find(x=>x.id===r.id);const ns=it?nsOf(it,rowGrade(r)):!!r.ns;const x={...r,...rowDL(r),g:rowGrade(r),inc:true,cost:it?costFor(it,rowGrade(r)):""};if(ns){x.ns=true;x.d="";x.l=""}else delete x.ns;return x});Q.rfqIds=eq.rfqIds||Q.rfqIds;$("#q_tbl").innerHTML="";renderQuoteTbl();
+    if(opt.fromIds){$("#q_warn").insertAdjacentHTML("beforebegin",`<div class="dupnote">Barang ini sudah ada di quotation <b>${esc(eq.no)}</b>, jadi quotation itu yang dibuka untuk direvisi (nomor tetap). <button type="button" class="linkbtn" id="q_fresh">Buat quotation baru dengan nomor baru</button></div>`);
+      $("#q_fresh").onclick=()=>{closeOverlay();openQuote(opt.fromIds,null,{fresh:true})}}
     if(qStatus(eq)==="approved")$("#q_warn").insertAdjacentHTML("beforebegin",`<div class="dupnote">Quotation ini sudah disetujui. Setelah diubah, quotation ${S.isApprover?"langsung disetujui ulang atas nama Anda":"dikirim ulang ke pimpinan untuk disetujui"}. PDF/Excel versi lama tidak berlaku lagi.</div>`);
     const a=(S.approvals||{})[qid];if(a&&a.status==="revision"&&a.submittedAt===eq.submittedAt)$("#q_warn").insertAdjacentHTML("beforebegin",`<div class="dupnote">Catatan revisi dari pimpinan: “${esc(a.note)}”</div>`)}
   ["q_fl","q_fu"].forEach(i=>{rpInput($("#"+i));$("#"+i).addEventListener("input",frInfo)});
@@ -1217,7 +1222,6 @@ function quoteWaText(d){const L=[`*QUOTATION*`,`Number: ${d.no}`,`Date: ${dShort
     if(r.ns){L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit}${r.brand?" ("+r.brand+")":""} – NO STOCK`)}
     else if(dl){const x=rowDL(r);L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit}${r.brand?" ("+r.brand+")":""}\n    Laut: ${x.l===""?"-":"Rp "+fmtEn(x.l)} | Udara: ${x.d===""?"-":"Rp "+fmtEn(x.d)}`)}
     else{tot+=r.total;L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit} × Rp ${fmtEn(r.price)} = Rp ${fmtEn(r.total)}${r.brand?" ("+r.brand+")":""}`)}})});
-  if(!dl)L.push("",`Total: Rp ${fmtEn(tot)}`);
   L.push("",`Price Terms: ${d.priceTerms}`,`Delivery Time: ${d.deliveryTime}`,`Validity: ${d.validityQ}`,`Payment Terms: ${d.paymentTerms}`,`VAT: ${d.vat}`,"","Best Regards,",d.signer,"PT. Sentra Mulia Mandiri");return L.join("\n")}
 async function fetchB64(path){const r=await fetch(path);if(!r.ok)throw new Error("Gagal memuat "+path);const b=new Uint8Array(await r.arrayBuffer());let s="";for(let i=0;i<b.length;i+=32768)s+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(s)}
 let QA=null;
@@ -1318,7 +1322,6 @@ async function quoteXlsx(d,approved){
       put("G"+r,x.brand||"",{al:"center"});ws.getCell("G"+r).alignment={horizontal:"center",vertical:"top"};
       const ln=Math.max(1,Math.ceil(String(x.desc||"").length/62));if(ln>1)ws.getRow(r).height=14*ln;r++});
     cellB(r);r++});
-  if(!DL){const tot=d.rows.reduce((s,x)=>s+(Number(x.price)||0)*(Number(x.qty)||0),0);ws.mergeCells(`A${r}:E${r}`);put("A"+r,"TOTAL",{b:true,al:"right"});const t=ws.getCell("F"+r);t.value={formula:`SUM(F${first}:F${r-1})`,result:tot};t.numFmt=NF;F(t,{b:true});t.alignment={horizontal:"right"};for(let k=1;k<=7;k++)ws.getCell(r,k).border=box;r++}
   r++;
   put("A"+r,"Terms & Conditions :",{b:true});r++;
   [["Price Terms",d.priceTerms],["Delivery Time",d.deliveryTime],["Validity of Quotation",d.validityQ],["Payment Terms",d.paymentTerms],["VAT",d.vat]].forEach(([k,v])=>{ws.mergeCells(`A${r}:B${r}`);put("A"+r,k);ws.mergeCells(`C${r}:G${r}`);put("C"+r,v||"");ul(r,3,7);r++});
