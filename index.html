@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261125124436"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261125160442"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -139,6 +139,7 @@
 .qt td:last-child{white-space:normal}.qt td:last-child .sm{display:block;width:100%;text-align:left;padding:3px 6px;min-height:28px}
 .pcell>.nstag{align-self:flex-start;width:auto;flex:none}
 .pe-was{font-size:11.5px;color:var(--muted,#6b7480);font-weight:400;white-space:nowrap}.pe-prev{border:1px dashed var(--line,#d5dbe3);border-radius:10px;padding:6px 10px;margin:0 0 10px;background:color-mix(in srgb,var(--s-tawar,#2f6fd6) 5%,transparent)}.pe-prev summary{cursor:pointer;padding:4px 0}.pe-prev .pe-list{margin-top:6px}.h-qs{margin-top:4px;text-align:left;font-size:12px;display:grid;gap:2px}.h-qs .used b{text-decoration:underline}
+.via-seg{display:inline-flex;margin-bottom:4px;border:1px solid var(--line,#cfd6df);border-radius:8px;overflow:hidden}.via-seg button{border:0;border-radius:0;background:transparent}.via-seg button.on{background:var(--ink,#1c2b4a);color:#fff;font-weight:700}.via-seg button{padding:3px 10px;min-height:30px;font-size:12.5px}.via-tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;background:color-mix(in srgb,var(--s-tawar,#2f6fd6) 14%,transparent);color:var(--s-tawar,#2f6fd6)}.via-tag.u{background:color-mix(in srgb,var(--s-po,#c77d12) 16%,transparent);color:var(--s-po,#a5650a)}
 </style></head><body>
 <title>Tracking Pengadaan SMM</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -714,10 +715,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261125124436">
-<script src="config.js?v=20261125124436"></script>
+<link rel="stylesheet" href="supa.css?v=20261125160442">
+<script src="config.js?v=20261125160442"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261125124436"></script>
+<script src="supa.js?v=20261125160442"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1094,11 +1095,15 @@ const rowDL=r=>(r.d!==undefined||r.l!==undefined)?{d:numOr(r.d),l:numOr(r.l)}:{d
 const hasDL=rows=>(rows||[]).some(r=>r.d!==undefined||r.l!==undefined);
 const rowPrimary=r=>{const x=rowDL(r);return x.l!==""?x.l:x.d};
 /* quotation price mode: "l" laut saja, "u" udara saja, "lu" keduanya; old quotations keep their layout */
-const qMode=d=>d&&["l","u","lu"].includes(d.mode)?d.mode:(hasDL(d&&d.rows)?"lu":"one");
+const qMode=d=>d&&["l","u","lu","m"].includes(d.mode)?d.mode:(hasDL(d&&d.rows)?"lu":"one");
 const isDL=d=>qMode(d)==="lu";
-const QMODE_LBL={l:"Laut",u:"Udara",lu:"Laut & Udara"};
-const lastQMode=()=>{try{const m=localStorage.getItem("smm_qmode");if(["l","u","lu"].includes(m))return m}catch{}return "l"};
-const modeRows=(rows,m)=>m==="l"?rows.map(r=>({...r,d:"",price:r.l,total:(Number(r.l)||0)*(Number(r.qty)||0)})):m==="u"?rows.map(r=>({...r,l:"",price:r.d,total:(Number(r.d)||0)*(Number(r.qty)||0)})):rows;
+const QMODE_LBL={l:"Laut",u:"Udara",lu:"Laut & Udara",m:"Per barang (Laut/Udara)"};
+const rowVia=r=>r&&r.via==="d"?"d":"l";
+/* pengelompokan untuk dokumen: mode "Per barang" dipisah VIA LAUT / VIA UDARA */
+function qGroupsOut(d){const rows=d.rows||[];if(qMode(d)!=="m")return qGroups(rows);const out=[];
+  [["l","Via Laut :"],["d","Via Udara :"]].forEach(([v,lb])=>{const sub=rows.filter(r=>rowVia(r)===v);if(sub.length)out.push({name:lb,rows:sub})});return out}
+const lastQMode=()=>{try{const m=localStorage.getItem("smm_qmode");if(["l","u","lu","m"].includes(m))return m}catch{}return "l"};
+const modeRows=(rows,m)=>m==="m"?rows.map(r=>{const v=rowVia(r);const pr=v==="d"?r.d:r.l;return {...r,via:v,l:v==="l"?r.l:"",d:v==="d"?r.d:"",price:pr,total:(Number(pr)||0)*(Number(r.qty)||0)}}):m==="l"?rows.map(r=>({...r,d:"",price:r.l,total:(Number(r.l)||0)*(Number(r.qty)||0)})):m==="u"?rows.map(r=>({...r,l:"",price:r.d,total:(Number(r.d)||0)*(Number(r.qty)||0)})):rows;
 const rowGrade=r=>r.g!=null&&r.g!==""?normGrade(r.g):normGrade(r.brand);
 function quoteRowsFor(i){return quoteRowsFor0(i).map(r=>nsOf(i,r.g)?{...r,ns:true,d:"",l:""}:r)}
 function quoteRowsFor0(i){const base={id:i.id,inc:true,group:i.unitAlat||"",desc:[i.desc,i.part].filter(Boolean).join(" "),qty:Number(i.qty)||0,unit:i.unit||"PCS"};
@@ -1148,7 +1153,7 @@ function openQuote(ids,qid,opt={}){
     <div class="sec">To</div>
     <div class="g4">${f("q_name","Name (nama PT lengkap)",cp.name||cust,'list="dlCust" autocomplete="off"')}<datalist id="dlCust">${custList().map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist>${f("q_address","Address",cp.address)}${f("q_country","Country",cp.country)}${f("q_phone","Phone",cp.phone)}${f("q_attn","Attn.",cp.attn)}${f("q_cc","CC",cp.cc)}</div>
     <div class="bar"><span class="sub">Baris dikelompokkan per unit (judul tebal di PDF). OEM dan Genuine tampil sebagai baris terpisah; klik <b>+ jenis</b> untuk menambah baris jenis lain dari part yang sama. Kolom Brand menentukan jenis.</span><span class="sub" id="q_warn"></span></div>
-    <div class="qmode"><span class="qm-l">Harga yang ditawarkan</span><div class="seg qm-seg" role="radiogroup" aria-label="Harga yang ditawarkan"><button type="button" data-qm="l">Laut saja</button><button type="button" data-qm="u">Udara saja</button><button type="button" data-qm="lu">Laut &amp; Udara</button></div></div>
+    <div class="qmode"><span class="qm-l">Harga yang ditawarkan</span><div class="seg qm-seg" role="radiogroup" aria-label="Harga yang ditawarkan"><button type="button" data-qm="l">Laut saja</button><button type="button" data-qm="u">Udara saja</button><button type="button" data-qm="m" title="Pilih laut atau udara untuk setiap barang">Per barang</button><button type="button" data-qm="lu">Laut &amp; Udara</button></div></div>
     <div id="q_tbl"></div>
     <datalist id="dlBrand"><option value="OEM"><option value="GENUINE"><option value="ORIGINAL"><option value="THAILAND"><option value="JEPANG"></datalist>
     <details><summary>Terms & Conditions</summary><div class="g4" style="margin-top:8px">
@@ -1187,9 +1192,9 @@ function syncQuote(){document.querySelectorAll("#q_tbl [data-qi]").forEach(el=>{
 function qGroups(rows){const g=[];rows.forEach(r=>{let x=g.find(y=>y.name===r.group);if(!x){x={name:r.group,rows:[]};g.push(x)}x.rows.push(r)});return g}
 function renderQuoteTbl(){if(!$("#q_tbl"))return;syncQuote();
   const gs=qGroups(Q.rows.map((r,i)=>({...r,i})));const cnt={};Q.rows.forEach(r=>{if(r.inc)cnt[r.id]=(cnt[r.id]||0)+1});
-  const dis=S.isApprover?"":"disabled";const M=Q.mode||"lu";const NC=M==="lu"?9:8;
-  $("#q_tbl").innerHTML=`<div class="tbl-wrap"><table class="mini qt" style="min-width:${M==="lu"?940:820}px"><thead><tr><th style="width:30px"></th><th style="width:34px">No</th><th>Description</th><th class="num" style="width:62px">Qty</th><th style="width:62px">Unit</th>${M!=="u"?`<th class="num" style="width:124px">Harga Laut (Rp)</th>`:""}${M!=="l"?`<th class="num" style="width:124px">Harga Udara (Rp)</th>`:""}<th style="width:124px">Brand / jenis</th><th style="width:112px"></th></tr></thead><tbody>
-  ${gs.map(g=>{let n=0;return (g.name?`<tr class="qg"><td></td><td></td><td colspan="${NC-2}"><b>${esc(g.name)}</b></td></tr>`:"")+g.rows.map(r=>{if(r.inc)n++;const miss=r.inc&&!r.ns&&(M==="l"?r.l==="":M==="u"?r.d==="":(r.d===""&&r.l===""));const c=Number(r.cost);
+  const dis=S.isApprover?"":"disabled";const M=Q.mode||"lu";const NC=M==="lu"?9:8;const MX=M==="m";
+  $("#q_tbl").innerHTML=`<div class="tbl-wrap"><table class="mini qt" style="min-width:${M==="lu"?940:820}px"><thead><tr><th style="width:30px"></th><th style="width:34px">No</th><th>Description</th><th class="num" style="width:62px">Qty</th><th style="width:62px">Unit</th>${MX?`<th class="num" style="width:170px">Kirim via · Harga (Rp)</th>`:`${M!=="u"?`<th class="num" style="width:124px">Harga Laut (Rp)</th>`:""}${M!=="l"?`<th class="num" style="width:124px">Harga Udara (Rp)</th>`:""}`}<th style="width:124px">Brand / jenis</th><th style="width:112px"></th></tr></thead><tbody>
+  ${gs.map(g=>{let n=0;return (g.name?`<tr class="qg"><td></td><td></td><td colspan="${NC-2}"><b>${esc(g.name)}</b></td></tr>`:"")+g.rows.map(r=>{if(r.inc)n++;const miss=r.inc&&!r.ns&&(MX?(rowVia(r)==="d"?r.d:r.l)==="":M==="l"?r.l==="":M==="u"?r.d==="":(r.d===""&&r.l===""));const c=Number(r.cost);
     const low=v=>v!==""&&c>0&&Number(v)<c?`<div class="mg neg">di bawah modal</div>`:"";const noB=r.inc&&cnt[r.id]>1&&!r.brand;
     const it=S.items.find(x=>x.id===r.id);
     return `<tr class="${r.inc?"":"off"}"><td><input type="checkbox" data-qi="${r.i}" data-qf="inc" ${r.inc?"checked":""} aria-label="Sertakan"></td><td class="num">${r.inc?n:""}</td>
@@ -1197,8 +1202,9 @@ function renderQuoteTbl(){if(!$("#q_tbl"))return;syncQuote();
      <td class="num"><input class="pin" style="width:56px" data-qi="${r.i}" data-qf="qty" value="${r.qty}"></td>
      <td><input data-qi="${r.i}" data-qf="unit" value="${esc(r.unit)}" style="width:56px"></td>
      ${r.ns?`<td class="num" colspan="${M==="lu"?2:1}"><span class="nstag" title="Diatur di harga supplier (RFQ)">NO STOCK</span></td>`:""}
-     ${!r.ns&&M!=="u"?`<td class="num"><input class="pin ${miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="l" value="${r.l===""?"":fmtEn(r.l)}" placeholder="${S.isApprover?"laut":"pimpinan"}" ${dis}>${low(r.l)}${it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
-     ${!r.ns&&M!=="l"?`<td class="num"><input class="pin ${M==="u"&&miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="d" value="${r.d===""?"":fmtEn(r.d)}" placeholder="${S.isApprover?"udara":"pimpinan"}" ${dis}>${low(r.d)}${M==="u"&&it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
+     ${!r.ns&&MX?(()=>{const v=rowVia(r);return `<td class="num"><div class="seg via-seg" role="radiogroup" aria-label="Kirim via"><button type="button" class="${v==="l"?"on":""}" data-qvia="${r.i}" data-v="l" aria-checked="${v==="l"}">Laut</button><button type="button" class="${v==="d"?"on":""}" data-qvia="${r.i}" data-v="d" aria-checked="${v==="d"}">Udara</button></div><input class="pin ${miss?"chk":""}" style="width:140px" data-qi="${r.i}" data-qf="${v}" value="${r[v]===""||r[v]==null?"":fmtEn(r[v])}" placeholder="${S.isApprover?(v==="d"?"harga udara":"harga laut"):"pimpinan"}" ${dis}>${low(r[v]??"")}${it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`})():""}
+     ${!r.ns&&!MX&&M!=="u"?`<td class="num"><input class="pin ${miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="l" value="${r.l===""?"":fmtEn(r.l)}" placeholder="${S.isApprover?"laut":"pimpinan"}" ${dis}>${low(r.l)}${it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
+     ${!r.ns&&!MX&&M!=="l"?`<td class="num"><input class="pin ${M==="u"&&miss?"chk":""}" style="width:112px" data-qi="${r.i}" data-qf="d" value="${r.d===""?"":fmtEn(r.d)}" placeholder="${S.isApprover?"udara":"pimpinan"}" ${dis}>${low(r.d)}${M==="u"&&it?.part?offerLine(lastOffer(it.part,it.id),true):""}</td>`:""}
      <td><input class="${noB?"chk":""}" data-qi="${r.i}" data-qf="brand" list="dlGrade" value="${esc(r.brand)}" placeholder="OEM" style="width:100%"></td>
      <td><button type="button" class="ghost sm" data-qdup="${r.i}" title="Tambah baris jenis lain untuk part ini">+ jenis</button></td></tr>`}).join("")}).join("")}
   </tbody></table></div>${gradeDL()}`;
@@ -1207,6 +1213,8 @@ function renderQuoteTbl(){if(!$("#q_tbl"))return;syncQuote();
   $("#q_warn").innerHTML=(miss?`<span class="late-tag">${miss} baris belum ada harga</span> `:"")+(dupB?`<span class="late-tag">Part dengan beberapa baris wajib punya Brand/jenis berbeda</span>`:"");
   $("#q_sum").innerHTML=`${inc.length} baris · Total ${M==="u"?"udara":"laut"} <b>Rp ${fmtEn(tot)}</b>${M==="lu"?` <span class="sub">(tidak dicetak)</span>`:""}`;
   document.querySelectorAll("#q_tbl [data-qi]").forEach(el=>el.addEventListener("change",renderQuoteTbl));
+  document.querySelectorAll("#q_tbl [data-qvia]").forEach(b=>b.onclick=()=>{syncQuote();const r=Q.rows[+b.dataset.qvia];const nv=b.dataset.v;if(!r||rowVia(r)===nv)return;
+    if(nv==="d"){if(r.d===""||r.d==null)r.d=r.l??"";r.l=""}else{if(r.l===""||r.l==null)r.l=r.d??"";r.d=""}r.via=nv;$("#q_tbl").innerHTML="";renderQuoteTbl()});
   document.querySelectorAll("#q_tbl [data-qdup]").forEach(b=>b.onclick=()=>{syncQuote();const k=+b.dataset.qdup;const r=Q.rows[k];Q.rows.splice(k+1,0,{...r,inc:true,g:"",brand:"",d:"",l:"",cost:""});$("#q_tbl").innerHTML="";renderQuoteTbl();
     const el=document.querySelector(`#q_tbl [data-qi="${k+1}"][data-qf="brand"]`);if(el)el.focus()});
 }
@@ -1217,9 +1225,9 @@ function quoteData(){syncQuote();const g=k=>$("#q_"+k).value.trim();
   return {no:g("no"),date:g("date"),rfqRef:g("rfqref"),rfqDate:g("rfqdate"),name:g("name"),address:g("address"),country:g("country"),phone:g("phone"),attn:g("attn"),cc:g("cc"),
     priceTerms:g("priceTerms"),deliveryTime:g("deliveryTime"),validityQ:g("validityQ"),paymentTerms:g("paymentTerms"),vat:g("vat"),signer:g("signer"),sig:$("#q_sig").checked,
     fl:Q.mode==="u"?0:rpVal($("#q_fl").value),fu:Q.mode==="l"?0:rpVal($("#q_fu").value),mode:Q.mode||"lu",
-    rows:modeRows(Q.rows.filter(r=>r.inc).map(r=>r.ns?{...r,d:"",l:""}:{...r}),Q.mode||"lu").map(r=>{const pr=r.ns?"":rowPrimary(r);return {id:r.id,group:r.group,desc:r.desc,qty:r.qty,unit:r.unit,g:normGrade(r.brand)||r.g||"",d:r.d,l:r.l,price:pr,brand:r.brand,total:(Number(pr)||0)*(Number(r.qty)||0),...(r.ns?{ns:true}:{})}})}}
+    rows:modeRows(Q.rows.filter(r=>r.inc).map(r=>r.ns?{...r,d:"",l:""}:{...r}),Q.mode||"lu").map(r=>{const pr=r.ns?"":rowPrimary(r);return {id:r.id,group:r.group,desc:r.desc,qty:r.qty,unit:r.unit,g:normGrade(r.brand)||r.g||"",d:r.d,l:r.l,price:pr,brand:r.brand,total:(Number(pr)||0)*(Number(r.qty)||0),...(r.ns?{ns:true}:{}),...(Q.mode==="m"?{via:rowVia(r)}:{})}})}}
 function quoteWaText(d){const L=[`*QUOTATION*`,`Number: ${d.no}`,`Date: ${dShort(d.date)}`,`To: ${d.name}${d.attn?" – Attn. "+d.attn:""}`];if(d.rfqRef)L.push(`RFQ Ref.: ${d.rfqRef}`);
-  const dl=isDL(d);let tot=0;qGroups(d.rows).forEach(g=>{L.push("");if(g.name)L.push(`*${g.name}*`);g.rows.forEach((r,i)=>{
+  const dl=isDL(d);let tot=0;qGroupsOut(d).forEach(g=>{L.push("");if(g.name)L.push(`*${g.name}*`);g.rows.forEach((r,i)=>{
     if(r.ns){L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit}${r.brand?" ("+r.brand+")":""} – NO STOCK`)}
     else if(dl){const x=rowDL(r);L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit}${r.brand?" ("+r.brand+")":""}\n    Laut: ${x.l===""?"-":"Rp "+fmtEn(x.l)} | Udara: ${x.d===""?"-":"Rp "+fmtEn(x.d)}`)}
     else{tot+=r.total;L.push(`${i+1}. ${r.desc} – ${r.qty} ${r.unit} × Rp ${fmtEn(r.price)} = Rp ${fmtEn(r.total)}${r.brand?" ("+r.brand+")":""}`)}})});
@@ -1259,7 +1267,7 @@ async function quotePdf(d,approved){
   const grid=(yy,h,merge)=>{doc.setLineWidth(.5);doc.rect(X0,yy,X1-X0,h);C.slice(1,-1).forEach((x,i)=>{if(merge&&i>=1&&i<=3)return;L(x,yy,x,yy+h)})};
   const page=()=>{if(y>735){doc.addPage();y=40;head()}};
   head();
-  qGroups(d.rows).forEach((g,gi)=>{
+  qGroupsOut(d).forEach((g,gi)=>{
     if(g.name){page();F("bold",7.2);const lines=doc.splitTextToSize(g.name,C[4]-C[1]-6);const h=Math.max(RH,lines.length*8+1);grid(y,h,true);T(lines,49,y+6.6,{lineHeightFactor:1.1});y+=h}
     g.rows.forEach((r,i)=>{page();F("normal",6.6);const dl=doc.splitTextToSize(r.desc,C[2]-C[1]-4);const h=Math.max(RH,dl.length*7.4+1.6);grid(y,h,false);
       F("normal",7.8);T(String(i+1),40.5,y+7,{align:"center"});F("normal",6.6);T(dl,49,y+6.4,{lineHeightFactor:1.12});
@@ -1312,7 +1320,7 @@ async function quoteXlsx(d,approved){
   const cellB=(rr)=>{for(let k=1;k<=7;k++)ws.getCell(rr,k).border=box};
   const num=(rr,col,v)=>{const c=ws.getCell(rr,col);if(v===""||v==null){c.value="-";c.alignment={horizontal:"right"}}else{c.value=Number(v);c.numFmt=NF;c.alignment={horizontal:"right",vertical:"top"}}F(c)};
   const first=r;
-  qGroups(d.rows).forEach(g=>{
+  qGroupsOut(d).forEach(g=>{
     if(g.name){cellB(r);put("B"+r,g.name,{b:true,wrap:true});r++}
     g.rows.forEach((x,i)=>{cellB(r);put("A"+r,i+1,{al:"center"});put("B"+r,x.desc,{wrap:true});ws.getCell("A"+r).alignment={horizontal:"center",vertical:"top"};ws.getCell("B"+r).alignment={wrapText:true,vertical:"top"};
       const q=ws.getCell("C"+r);q.value=Number(x.qty)||0;q.numFmt=NF;q.alignment={horizontal:"center",vertical:"top"};F(q);put("D"+r,x.unit,{al:"center"});ws.getCell("D"+r).alignment={horizontal:"center",vertical:"top"};
@@ -2209,7 +2217,7 @@ function qData(q){if(q.d){const a=(S.approvals||{})[q.id];return a&&a.status==="
   const c=qc();return {no:q.no,date:q.date,rfqRef:q.ref||"",rfqDate:"",name:q.to||"",address:"",country:"",phone:"",attn:"",cc:"",priceTerms:c.priceTerms,deliveryTime:c.deliveryTime,validityQ:c.validityQ,paymentTerms:c.paymentTerms,vat:c.vat,signer:c.signer,sig:true,
     rows:(q.rows||[]).map(r=>{const it=S.items.find(x=>x.id===r.id)||{};return {id:r.id,group:r.group??it.unitAlat??"",desc:r.part&&!String(r.desc).includes(r.part)?`${r.desc} ${r.part}`:r.desc,qty:r.qty,unit:r.unit,price:r.price,brand:r.brand||""}})}}
 function quoteSheet(d,approved){
-  const gs=qGroups((d.rows||[]).map(r=>({...r,total:(Number(r.price)||0)*(Number(r.qty)||0)})));const DL=isDL(d);
+  const gs=qGroupsOut({...d,rows:(d.rows||[]).map(r=>({...r,total:(Number(r.price)||0)*(Number(r.qty)||0)}))});const DL=isDL(d);
   return `<div class="paper-wrap"><div class="paper ${approved?"":"is-draft"}">
    ${approved?"":`<div class="wm">DRAFT<small>${S.quotePrevState==="legacy"?"UJI COBA":"MENUNGGU PERSETUJUAN"}</small></div>`}
    <div class="pp-head"><img src="assets/kop.jpg" alt="PT. Sentra Mulia Mandiri"><div class="pp-box"><u><b>QUOTATION</b></u><span><u>NUMBER:</u></span><span class="c">${esc(d.no)}</span><span><u>DATE:</u></span><span class="c">${dShort(d.date)}</span></div></div>
@@ -2293,7 +2301,7 @@ async function submitQuote(asApprover){
   if(miss&&S.isApprover&&!S.quoteMissOk){S.quoteMissOk=true;toast(`${miss} item belum ada harga. Klik sekali lagi untuk tetap menyetujui.`);return false}
   S.quoteMissOk=false;
   const now=Date.now();const id=Q.editId||S.db.collection("quotes").doc().id;const old=(S.quotes||{})[id];
-  const rec={no:d.no,d:{...d,rows:d.rows.map(r=>({id:r.id,group:r.group,desc:r.desc,qty:r.qty,unit:r.unit,g:r.g,d:r.d,l:r.l,price:r.price,brand:r.brand,...(r.ns?{ns:true}:{})}))},rfqIds:Q.rfqIds,
+  const rec={no:d.no,d:{...d,rows:d.rows.map(r=>({id:r.id,group:r.group,desc:r.desc,qty:r.qty,unit:r.unit,g:r.g,d:r.d,l:r.l,price:r.price,brand:r.brand,...(r.ns?{ns:true}:{}),...(r.via?{via:r.via}:{})}))},rfqIds:Q.rfqIds,
     status:"pending",submittedAt:now,createdAt:old?.createdAt||now,createdBy:old?.createdBy||S.myId||"",updatedAt:now,updatedBy:S.myId||""};
   try{await S.db.doc("quotes/"+id).set(rec);
     const c=qc();const seq=Number((d.no.match(/^\s*(\d+)/)||[])[1]);if(seq&&seq>(Number(c.qCounter)||0))await S.db.doc("settings/company").set({...(S.settings||{}),qCounter:seq});
@@ -2321,19 +2329,20 @@ async function downloadQuote(q,approved,fmt){const X=fmt==="xlsx";
   catch(e){if(e?.code!=="declined"){diag(X?"quote-xlsx-fail":"quote-pdf-fail",errInfo(e));toast(e?.code?`Unduh gagal (${e.code})`:String(e?.message||(X?"Excel gagal dibuat":"PDF gagal dibuat")))}}
 }
 function openReview(qid){
-  const q=(S.quotes||{})[qid];if(!q)return;const rows=q.d?.rows||[];const QC=quoteCostFn(q.d);const CM=QC.fn;const QM=["l","u"].includes(q.d?.mode)?q.d.mode:"lu";const RC=QM==="lu"?8:7;
-  const P=rows.map(r=>{const it=S.items.find(x=>x.id===r.id)||{};const o=(it.sellOpts||[]).find(x=>x.g===rowGrade(r));const x=rowDL(r);return {d:x.d!==""?x.d:(o?o.d:""),l:x.l!==""?x.l:(o?o.l:"")}});
+  const q=(S.quotes||{})[qid];if(!q)return;const rows=q.d?.rows||[];const QC=quoteCostFn(q.d);const CM=QC.fn;const QM=["l","u","m"].includes(q.d?.mode)?q.d.mode:"lu";const RC=QM==="lu"?8:7;const EM=r=>QM==="m"?(rowVia(r)==="d"?"u":"l"):QM;
+  const P=rows.map(r=>{const it=S.items.find(x=>x.id===r.id)||{};const o=(it.sellOpts||[]).find(x=>x.g===rowGrade(r));const x=rowDL(r);const p={d:x.d!==""?x.d:(o?o.d:""),l:x.l!==""?x.l:(o?o.l:"")};if(QM==="m"){if(rowVia(r)==="d")p.l="";else p.d=""}return p});
   $("#overlay").innerHTML=`<div class="scrim" data-close="1"></div><div class="modal"><div class="box" role="dialog" aria-label="Tinjau quotation">
    <div class="dh"><div><h2>Tinjau quotation ${esc(q.no)}</h2><div class="sub">${esc(q.d?.name||"")}${q.d?.attn?" · Attn. "+esc(q.d.attn):""} · diajukan ${esc(nameOf(q.createdBy))}</div></div><button type="button" class="ghost" data-close="1" aria-label="Tutup">✕</button></div>
    <div class="db">
-    <div class="tbl-wrap"><table class="mini" style="min-width:940px"><thead><tr><th>Deskripsi</th><th>Jenis</th><th class="num">Qty</th><th class="num">Biaya / sat.${QC.fl>0||QC.fu>0?" (modal + ongkir)":""}</th>${QM!=="u"?`<th class="num">Harga Laut</th>`:""}${QM!=="l"?`<th class="num">Harga Udara</th>`:""}<th class="num">${QM==="lu"?"Margin L / U":"Margin"}</th><th>Supplier</th></tr></thead><tbody>
+    <div class="tbl-wrap"><table class="mini" style="min-width:940px"><thead><tr><th>Deskripsi</th><th>Jenis</th><th class="num">Qty</th><th class="num">Biaya / sat.${QC.fl>0||QC.fu>0?" (modal + ongkir)":""}</th>${QM==="m"?`<th class="num">Kirim via · Harga</th>`:`${QM!=="u"?`<th class="num">Harga Laut</th>`:""}${QM!=="l"?`<th class="num">Harga Udara</th>`:""}`}<th class="num">${QM==="lu"?"Margin L / U":"Margin"}</th><th>Supplier</th></tr></thead><tbody>
     ${(()=>{let last=null;return rows.map((r,k)=>{const it=S.items.find(x=>x.id===r.id)||{};const g0=rowGrade(r);const c=costFor(it,g0);const qs=quotesOf(it).filter(x=>x.grade===g0);
       const hs=history(it.part,it.id).filter(h=>h.status==="kalah");const lost=hs[0];
       const g=r.group!==last?`<tr class="qg"><td colspan="${RC}"><b>${esc(r.group||"")}</b></td></tr>`:"";last=r.group;
-      return g+`<tr><td>${esc(r.desc)}${lost?`<div class="seen lost">Pernah kalah${lost.sellPrice?" @ "+rp(lost.sellPrice):""}</div>`:""}</td><td><b>${esc(r.brand||"—")}</b></td><td class="num">${r.qty} <span class="sub">${esc(r.unit)}</span></td><td class="num">${(()=>{const cl=CM(it,g0,"l"),cu=QC.fu>0||(QC.fu===null&&hasFreight(it,"d"))?CM(it,g0,"d"):null;const ln=(lb,v)=>v>0?`<div><span class="sub">${lb}</span> ${rp(v)} <span class="sub">→ saran ${fmtN(Math.round(v*(1+S.markup/100)/100)*100)}</span></div>`:"";const cu2=QM==="u"?CM(it,g0,"d"):cu;const sl=QM!=="u"&&cl>0,su=QM!=="l"&&cu2>0;return (sl||su)?(sl?ln("L",cl):"")+(su?ln("U",cu2):""):"—"})()}</td>
+      return g+`<tr><td>${esc(r.desc)}${lost?`<div class="seen lost">Pernah kalah${lost.sellPrice?" @ "+rp(lost.sellPrice):""}</div>`:""}</td><td><b>${esc(r.brand||"—")}</b></td><td class="num">${r.qty} <span class="sub">${esc(r.unit)}</span></td><td class="num">${(()=>{const cl=CM(it,g0,"l"),cu=QC.fu>0||(QC.fu===null&&hasFreight(it,"d"))?CM(it,g0,"d"):null;const ln=(lb,v)=>v>0?`<div><span class="sub">${lb}</span> ${rp(v)} <span class="sub">→ saran ${fmtN(Math.round(v*(1+S.markup/100)/100)*100)}</span></div>`:"";const em=EM(r);const cu2=em==="u"?CM(it,g0,"d"):cu;const sl=em!=="u"&&cl>0,su=em!=="l"&&cu2>0;return (sl||su)?(sl?ln("L",cl):"")+(su?ln("U",cu2):""):"—"})()}</td>
         ${r.ns?`<td class="num" colspan="${QM==="lu"?2:1}"><span class="nstag">NO STOCK</span></td>`:""}
-        ${!r.ns&&QM!=="u"?`<td class="num"><input class="pin" data-rl="${k}" value="${P[k].l===""?"":fmtN(P[k].l)}" placeholder="laut" ${S.isApprover?"":"disabled"}>${(()=>{const lo=it.part?lastOffer(it.part,it.id):null;return lo?`<button type="button" class="linkbtn" data-uselast="${k}" data-v="${lo.offered}" title="Pakai harga ini untuk laut">${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</button>`:""})()}</td>`:""}
-        ${!r.ns&&QM!=="l"?`<td class="num"><input class="pin" data-rd="${k}" value="${P[k].d===""?"":fmtN(P[k].d)}" placeholder="udara" ${S.isApprover?"":"disabled"}></td>`:""}
+        ${!r.ns&&QM==="m"?`<td class="num"><span class="via-tag ${rowVia(r)==="d"?"u":""}">${rowVia(r)==="d"?"UDARA":"LAUT"}</span> <input class="pin" ${rowVia(r)==="d"?`data-rd="${k}" value="${P[k].d===""?"":fmtN(P[k].d)}" placeholder="udara"`:`data-rl="${k}" value="${P[k].l===""?"":fmtN(P[k].l)}" placeholder="laut"`} ${S.isApprover?"":"disabled"}></td>`:""}
+        ${!r.ns&&QM!=="m"&&QM!=="u"?`<td class="num"><input class="pin" data-rl="${k}" value="${P[k].l===""?"":fmtN(P[k].l)}" placeholder="laut" ${S.isApprover?"":"disabled"}>${(()=>{const lo=it.part?lastOffer(it.part,it.id):null;return lo?`<button type="button" class="linkbtn" data-uselast="${k}" data-v="${lo.offered}" title="Pakai harga ini untuk laut">${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</button>`:""})()}</td>`:""}
+        ${!r.ns&&QM!=="m"&&QM!=="l"?`<td class="num"><input class="pin" data-rd="${k}" value="${P[k].d===""?"":fmtN(P[k].d)}" placeholder="udara" ${S.isApprover?"":"disabled"}></td>`:""}
         <td class="num" id="rm${k}"></td><td class="sub">${esc(qs.length?[...new Set(qs.map(x=>x.name))].join(", "):it.supplier||"")}</td></tr>`}).join("")})()}
     </tbody></table></div>
     <div class="pe-fbar">${QC.fl>0||QC.fu>0?`Ongkir pengiriman ke ${esc(q.d?.name||"customer")}: ${QC.fl>0?`laut <b>${rp(QC.fl)}</b>`:""}${QC.fl>0&&QC.fu>0?" · ":""}${QC.fu>0?`udara <b>${rp(QC.fu)}</b>`:""} — dibagi ke setiap barang sesuai nilai modal.`:QC.fl===null?"":`<span class="late-tag">Ongkir pengiriman belum diisi admin</span> Biaya masih modal saja.`}</div>
@@ -2342,17 +2351,17 @@ function openReview(qid){
    </div>
    <div class="df"><button type="button" class="ghost" id="r_draft" style="margin-right:auto">Lihat PDF draft</button><button type="button" class="ghost" id="r_draftx">Excel draft</button><button type="button" class="danger" id="r_rev">Minta revisi</button><button type="button" class="primary" id="r_ok">Setujui</button></div></div></div>`;
   const mgs=(v,c)=>c>0&&Number(v)>0?`<span class="mg ${v<c?"neg":""}" style="display:inline">${((v-c)/v*100).toFixed(1).replace(".",",")}%</span>`:"—";
-  const recalc=()=>{let tot=0,cost=0,miss=0;rows.forEach((r,k)=>{const it=S.items.find(x=>x.id===r.id)||{};const cl=CM(it,rowGrade(r),"l"),cu=CM(it,rowGrade(r),"d");const p=P[k];const useL=QM==="l"||(QM==="lu"&&p.l!=="");const c=useL?cl:cu;const q2=Number(r.qty)||0;const pr=QM==="l"?p.l:QM==="u"?p.d:(p.l!==""?p.l:p.d);
+  const recalc=()=>{let tot=0,cost=0,miss=0;rows.forEach((r,k)=>{const it=S.items.find(x=>x.id===r.id)||{};const cl=CM(it,rowGrade(r),"l"),cu=CM(it,rowGrade(r),"d");const p=P[k];const em=EM(r);const useL=em==="l"||(em==="lu"&&p.l!=="");const c=useL?cl:cu;const q2=Number(r.qty)||0;const pr=em==="l"?p.l:em==="u"?p.d:(p.l!==""?p.l:p.d);
       if(rows[k].ns){$("#rm"+k).innerHTML="—";return}
       if(pr===""||pr==null)miss++;else{tot+=pr*q2;if(c>0)cost+=c*q2}
-      $("#rm"+k).innerHTML=QM==="l"?mgs(p.l,cl):QM==="u"?mgs(p.d,cu):`${mgs(p.l,cl)} / ${mgs(p.d,cu)}`});
-    $("#rTot").innerHTML=`<span class="gp" style="--c:var(--ink);min-width:0;margin-right:6px">${QMODE_LBL[QM]}</span>Total ${QM==="u"?"udara":"laut"} <b>${rp(tot)}</b> <span class="sub">· Biaya ${cost>0?rp(cost):"—"} · Margin ${tot>0&&cost>0?((tot-cost)/tot*100).toFixed(1).replace(".",",")+"%":"—"}${miss?` · <span class="late-tag">${miss} baris belum ada harga</span>`:""}</span>`;return miss};
+      $("#rm"+k).innerHTML=em==="l"?mgs(p.l,cl):em==="u"?mgs(p.d,cu):`${mgs(p.l,cl)} / ${mgs(p.d,cu)}`});
+    $("#rTot").innerHTML=`<span class="gp" style="--c:var(--ink);min-width:0;margin-right:6px">${QMODE_LBL[QM]}</span>Total ${QM==="u"?"udara":QM==="m"?"":"laut"} <b>${rp(tot)}</b> <span class="sub">· Biaya ${cost>0?rp(cost):"—"} · Margin ${tot>0&&cost>0?((tot-cost)/tot*100).toFixed(1).replace(".",",")+"%":"—"}${miss?` · <span class="late-tag">${miss} baris belum ada harga</span>`:""}</span>`;return miss};
   recalc();
   const withP=()=>modeRows(rows.map((r,k)=>({...r,g:rowGrade(r),d:P[k].d,l:P[k].l,price:P[k].l!==""?P[k].l:P[k].d})),QM);
   document.querySelectorAll("[data-uselast]").forEach(b=>b.onclick=()=>{if(!S.isApprover)return;const k=+b.dataset.uselast;P[k].l=Number(b.dataset.v);const el=document.querySelector(`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k].l);recalc()});
   const lastN=rows.filter((r,k)=>!r.ns&&P[k].d===""&&P[k].l===""&&lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id)).length;
   if(lastN&&S.isApprover)$("#rTot").insertAdjacentHTML("afterend",`<button type="button" class="sm" id="rFill">Isi ${lastN} harga ${QM==="u"?"udara":"laut"} kosong dari harga terakhir</button>`);
-  if($("#rFill"))$("#rFill").onclick=()=>{rows.forEach((r,k)=>{if(!r.ns&&P[k].d===""&&P[k].l===""){const lo=lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id);if(lo){const fk=QM==="u"?"d":"l";P[k][fk]=lo.offered;const el=document.querySelector(fk==="d"?`[data-rd="${k}"]`:`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k][fk])}}});$("#rFill").remove();recalc();toast(`Harga terakhir diisi ke kolom ${QM==="u"?"udara":"laut"}. Periksa jenis barang dan item yang dulu tidak diorder.`)};
+  if($("#rFill"))$("#rFill").onclick=()=>{rows.forEach((r,k)=>{if(!r.ns&&P[k].d===""&&P[k].l===""){const lo=lastOffer(S.items.find(x=>x.id===r.id)?.part||"",r.id);if(lo){const fk=QM==="u"?"d":QM==="m"?rowVia(r):"l";P[k][fk]=lo.offered;const el=document.querySelector(fk==="d"?`[data-rd="${k}"]`:`[data-rl="${k}"]`);if(el)el.value=fmtN(P[k][fk])}}});$("#rFill").remove();recalc();toast(`Harga terakhir diisi ke kolom ${QM==="u"?"udara":"laut"}. Periksa jenis barang dan item yang dulu tidak diorder.`)};
   document.querySelectorAll("[data-rd],[data-rl]").forEach(el=>el.addEventListener("change",()=>{const v=el.value.trim()===""?"":parsePrice(el.value);if(v===null){toast("Format harga tidak dikenali");return}const k=+(el.dataset.rd??el.dataset.rl);P[k][el.dataset.rd!=null?"d":"l"]=v;el.value=v===""?"":fmtN(v);recalc()}));
   $("#r_draft").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false);
   $("#r_draftx").onclick=()=>downloadQuote({...q,d:{...q.d,rows:withP()}},false,"xlsx");
