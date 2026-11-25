@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261124143924"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261125124436"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -138,6 +138,7 @@
 .nstag{display:inline-block;font-weight:700;font-size:12px;letter-spacing:.02em;color:var(--s-batal,#b0413a);border:1px solid currentColor;border-radius:6px;padding:2px 8px}.on-ns{color:var(--s-batal,#b0413a)!important;font-weight:700}.pp-tbl td.ns{font-weight:700}
 .qt td:last-child{white-space:normal}.qt td:last-child .sm{display:block;width:100%;text-align:left;padding:3px 6px;min-height:28px}
 .pcell>.nstag{align-self:flex-start;width:auto;flex:none}
+.pe-was{font-size:11.5px;color:var(--muted,#6b7480);font-weight:400;white-space:nowrap}.pe-prev{border:1px dashed var(--line,#d5dbe3);border-radius:10px;padding:6px 10px;margin:0 0 10px;background:color-mix(in srgb,var(--s-tawar,#2f6fd6) 5%,transparent)}.pe-prev summary{cursor:pointer;padding:4px 0}.pe-prev .pe-list{margin-top:6px}.h-qs{margin-top:4px;text-align:left;font-size:12px;display:grid;gap:2px}.h-qs .used b{text-decoration:underline}
 </style></head><body>
 <title>Tracking Pengadaan SMM</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -713,10 +714,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261124143924">
-<script src="config.js?v=20261124143924"></script>
+<link rel="stylesheet" href="supa.css?v=20261125124436">
+<script src="config.js?v=20261125124436"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261124143924"></script>
+<script src="supa.js?v=20261125124436"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1377,7 +1378,7 @@ const normGrade=s=>{const g=String(s||"").trim().toUpperCase().replace(/\s+/g," 
 function knownGrades(){const all=new Set([...GRADES,...(S.extraGrades||[])]);S.items.forEach(i=>Object.values(i.quotes||{}).forEach(q=>{const g=normGrade(q&&q.grade);if(g)all.add(g)}));return all}
 const gradeKey=g=>supKey(normGrade(g)||"umum");
 function gradeDL(){const all=knownGrades();return `<datalist id="dlGrade">${[...all].map(g=>`<option value="${esc(g)}">`).join("")}</datalist>`}
-function quotesOf(it){return Object.entries(it.quotes||{}).filter(([k,q])=>q&&!q.del&&q.price!==""&&q.price!=null).map(([k,q])=>({key:k,name:q.name||"",grade:normGrade(q.grade),price:Number(q.price),stock:q.stock||"",note:q.note||"",at:q.at||"",kg:numOr(q.kg),fl:numOr(q.fl),fu:numOr(q.fu),franco:!!q.franco})).sort((a,b)=>a.grade.localeCompare(b.grade)||a.price-b.price)}
+function quotesOf(it){return Object.entries(it.quotes||{}).filter(([k,q])=>q&&!q.del&&q.price!==""&&q.price!=null).map(([k,q])=>({key:k,name:q.name||"",grade:normGrade(q.grade),price:Number(q.price),stock:q.stock||"",note:q.note||"",at:q.at||"",kg:numOr(q.kg),fl:numOr(q.fl),fu:numOr(q.fu),franco:!!q.franco,hist:Array.isArray(q.hist)?q.hist:[]})).sort((a,b)=>a.grade.localeCompare(b.grade)||a.price-b.price)}
 function costFor(it,g){const qs=quotesOf(it);g=normGrade(g);const m=qs.filter(q=>q.grade===g);if(m.length)return Math.min(...m.map(q=>q.price));if(!qs.length&&Number(it.price)>0)return Number(it.price);const any=qs.filter(q=>!q.grade);if(any.length)return Math.min(...any.map(q=>q.price));return null}
 const numOr=v=>v===""||v==null||isNaN(Number(v))?"":Number(v);
 /* ongkir per pengiriman (gudang -> perusahaan): total laut / udara per RFQ atau per quotation, dialokasikan ke barang sesuai nilai (modal x qty). mode "l" = laut, "d" = udara */
@@ -1415,9 +1416,14 @@ async function setSellOpts(ids,optsFor){
   const col=S.db.collection(`sell/${S.myId}/i`);const at=Date.now();
   try{for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const o=(typeof optsFor==="function"?optsFor(id):optsFor).map(x=>({g:normGrade(x.g),d:numOr(x.d),l:numOr(x.l)})).filter(x=>x.d!==""||x.l!=="");return col.doc(id).set({opts:o,price:primaryOf(o),at})}));return true}
   catch(e){if(e?.code==="invalid_argument")toast("Harga tawar tidak tersimpan: akun ini belum ditunjuk sebagai penyetuju.");else fail(e);return false}}
-async function addSupplierQuote(ids,{name,grade,price,stock,note}){
+async function addSupplierQuote(ids,{name,grade,price,stock,note,prevKey}){
   const key=supKey(name)+"__"+gradeKey(grade);const val={name,grade:normGrade(grade),price:Number(price),stock:stock||"",note:note||"",at:today(),del:false};
-  for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const it=S.items.find(x=>x.id===id)||{};const p={quotes:{[key]:val}};
+  for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>{const it=S.items.find(x=>x.id===id)||{};
+    // catatan perubahan harga: harga lama disimpan (maks. 10)
+    let hist=[];const was=(it.quotes||{})[key];const pk=prevKey&&prevKey!==key?(it.quotes||{})[prevKey]:null;
+    if(pk&&!pk.del){hist=[...(Array.isArray(pk.hist)?pk.hist:[])];hist.push({price:Number(pk.price),at:pk.at||"",name:pk.name||"",grade:normGrade(pk.grade)})}
+    if(was&&!was.del){hist=[...hist,...(Array.isArray(was.hist)?was.hist:[])];if(Number(was.price)!==val.price)hist.push({price:Number(was.price),at:was.at||"",name:was.name||"",grade:normGrade(was.grade)})}
+    const v1=hist.length?{...val,hist:hist.slice(-10)}:val;const p={quotes:{[key]:v1}};
     if(it.noStock&&(it.noStock[val.grade]||it.noStock["*"]))p.noStock={[val.grade]:false,"*":false};
     Object.entries(it.quotes||{}).forEach(([k,q])=>{if(k!==key&&q&&!q.del&&supKey(q.name||"")===supKey(name)&&normGrade(q.grade)===val.grade)p.quotes[k]={del:true}});
     const cur=Number(it.price);const old=(it.quotes||{})[key];if(!(cur>0)||val.price<=cur||(old&&!old.del&&it.supplier===name&&Number(old.price)===cur)){p.price=val.price;p.supplier=name;if(!it.source)p.source="supplier"}
@@ -1458,6 +1464,13 @@ function optsLine(opts){return (opts||[]).map(o=>`<div class="pl">${gradePill(o.
 function quotesLine(qs,max=3){return qs.slice(0,max).map(q=>`<div class="pl">${gradePill(q.grade)}<b>${fmtN(q.price)}</b><span class="sn">${esc(q.name)}</span></div>`).join("")+(qs.length>max?`<div class="sub">+${qs.length-max} lagi</div>`:"")}
 function rpInput(el){el.addEventListener("input",()=>{const d=el.value.replace(/[^\d]/g,"");el.value=d?Number(d).toLocaleString("id-ID"):""})}
 const rpVal=s=>{const d=String(s||"").replace(/[^\d]/g,"");return d?Number(d):""};
+/* harga supplier sebelumnya untuk part yang sama: penawaran di RFQ lain + harga beli di order supplier */
+function prevSupPrices(part,exceptIds){const k=looseKey(part||"");if(!k)return[];const ex=new Set(exceptIds||[]);const out=[];
+  const its=(partIndex().get(k)||[]).filter(i=>!ex.has(i.id));
+  for(const it of its){const r=S.rfqs[it.rfqId]||{};for(const q of quotesOf(it))out.push({kind:"q",name:q.name,grade:q.grade,price:q.price,at:q.at||r.date||"",ref:r.no||"",cust:r.customer||""})}
+  for(const o of Object.values(S.sos||{}))for(const l of o.lines||[]){if(ex.has(l.itemId))continue;const li=S.items.find(i=>i.id===l.itemId);if(looseKey(l.part||li?.part||"")!==k)continue;
+    out.push({kind:"b",name:o.supplier||"",grade:normGrade(l.grade||""),price:Number(l.price)||0,at:o.date||"",ref:o.no||"",cust:""})}
+  const seen=new Set();return out.filter(x=>x.price>0).sort((a,b)=>String(b.at).localeCompare(String(a.at))||(a.kind==="b"?-1:1)).filter(x=>{const kk=[x.kind,supKey(x.name),x.grade,x.price,x.ref].join("|");if(seen.has(kk))return false;seen.add(kk);return true})}
 function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overlay");const closeMe=()=>opt.stack?closeOverlay2():closeOverlay();
   const its=ids.map(id=>S.items.find(i=>i.id===id)).filter(Boolean);if(!its.length)return;ids=its.map(i=>i.id);const f=its[0];
   const qmap=new Map();its.forEach(it=>quotesOf(it).forEach(q=>{const p=qmap.get(q.key);if(!p||String(q.at)>=String(p.at))qmap.set(q.key,q)}));
@@ -1482,6 +1495,10 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
    <div class="db">
     <section class="pe-step"><div class="pe-h"><span class="pe-num">1</span><div><b>Harga dari supplier</b><div class="sub">Diisi admin. Satu part boleh punya beberapa jenis, mis. OEM dan Genuine.</div></div></div>
      <div id="pe_q"></div>
+     ${(()=>{const pv=prevSupPrices(f.part,ids);if(!pv.length)return "";const lb=pv.find(x=>x.kind==="b");
+         return `<details class="pe-prev" open><summary><b>Harga supplier sebelumnya</b> <span class="sub">untuk part ini (${pv.length})${lb?` · beli terakhir ${rp(lb.price)} dari ${esc(lb.name)}, ${fmtD(lb.at)}`:""}</span></summary>
+         <div class="pe-list">${pv.slice(0,8).map((x,k)=>`<div class="pe-it">${x.grade?gradePill(x.grade):`<span class="gp" style="--c:var(--s-baru)">—</span>`}<div class="pe-sup"><b>${esc(x.name)}</b><span class="sub">${x.kind==="b"?`<span class="ok-tag">Dibeli</span> order ${esc(x.ref)}`:`Penawaran · ${esc(x.ref)}${x.cust?` · ${esc(x.cust)}`:""}`} · ${fmtD(x.at)||"-"}</span></div><div class="pe-pr">${rp(x.price)}</div><div class="pe-act">${canQ?`<button type="button" class="sm" data-peprev="${k}">Pakai</button>`:""}</div></div>`).join("")}</div>
+         ${pv.length>8?`<div class="sub">+${pv.length-8} lainnya di tab Riwayat Harga</div>`:""}</details>`})()}
      ${canQ?`<div class="pe-form">
        <div class="pe-lbl">Jenis barang <span class="req">wajib</span></div>
        <div class="chips" id="pe_chips">${[...GRADES].map(g=>`<button type="button" class="chip" data-g="${g}">${gradePill(g)}</button>`).join("")}<button type="button" class="chip" data-g="*"><span class="gp" style="--c:var(--s-tawar)">LAINNYA…</span></button><input id="pe_go" placeholder="tulis jenis, mis. TAIWAN" hidden></div>
@@ -1509,7 +1526,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
   const drawQ0=()=>{const qs=[...qmap.values()].sort((a,b)=>gOrder(a.grade)-gOrder(b.grade)||a.price-b.price);
     const legacy=!qs.length&&Number(f.price)>0;
     $("#pe_q").innerHTML=qs.length?`<div class="pe-list">${qs.map(q=>{const used=its.every(it=>it.supplier===q.name&&Number(it.price)===q.price);
-      return `<div class="pe-it ${used?"used":""}">${gradePill(q.grade)}<div class="pe-sup"><b>${esc(q.name)}</b><span class="sub">${esc([q.stock,q.note,fmtD(q.at)].filter(Boolean).join(" · "))}</span></div><div class="pe-pr">${rp(q.price)}</div>
+      return `<div class="pe-it ${used?"used":""}">${gradePill(q.grade)}<div class="pe-sup"><b>${esc(q.name)}</b><span class="sub">${esc([q.stock,q.note,fmtD(q.at)].filter(Boolean).join(" · "))}</span></div><div class="pe-pr">${rp(q.price)}${(q.hist||[]).length?`<div class="pe-was" title="${esc(q.hist.slice().reverse().map(h=>`${rp(h.price)} (${fmtD(h.at)||"-"}${h.name&&h.name!==q.name?", "+h.name:""}${h.grade&&h.grade!==q.grade?", "+h.grade:""})`).join(" ← "))}">sebelumnya ${rp(q.hist[q.hist.length-1].price)}${q.hist[q.hist.length-1].at?` (${fmtD(q.hist[q.hist.length-1].at)})`:""}${q.hist.length>1?` · ${q.hist.length}× berubah`:""}</div>`:""}</div>
        <div class="pe-act">${used?`<span class="tag-used" title="Dipakai sebagai modal pembelian">✓ dipakai beli</span>`:canQ?`<button type="button" class="sm ghost" data-peuse="${esc(q.key)}">Pakai beli</button>`:""}${canQ?`<button type="button" class="ghost sm" data-peedit="${esc(q.key)}">Ubah</button><button type="button" class="ghost sm danger" data-pedel="${esc(q.key)}" aria-label="Hapus">✕</button>`:""}</div></div>`}).join("")}</div>`
       :legacy?`<div class="dupnote">Ada harga lama ${rp(f.price)} ${f.supplier?"dari "+esc(f.supplier):""} tanpa jenis. Masukkan ulang dengan jenisnya di bawah.</div>`
       :`<p class="sub pe-empty">${(f.askedTo||[]).length?`Sudah ditanyakan ke ${esc(f.askedTo.join(", "))}; belum ada harga.`:"Belum ada harga supplier."}</p>`};
@@ -1534,8 +1551,8 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
       const hint=t=>{$("#pe_hint").innerHTML=`<span class="late-tag">${t}</span>`};
       if(!g){hint("Pilih jenis barang dulu (OEM, GENUINE, …)");return}if(!name){hint("Isi nama supplier");$("#pe_sup").focus();return}if(!(p>0)){hint("Isi harga satuan");$("#pe_p").focus();return}
       const b=$("#pe_add");b.disabled=true;
-      try{const st=$("#pe_st").value,nt=$("#pe_n").value.trim();const old=editKey?qmap.get(editKey):null;const key=await addSupplierQuote(ids,{name,grade:g,price:p,stock:st,note:nt});
-        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today()};if(NS.has(g)||NS.has("*")){NS.delete(g);NS.delete("*");its.forEach(it=>{it.noStock={...(it.noStock||{}),[g]:false,"*":false}})}
+      try{const st=$("#pe_st").value,nt=$("#pe_n").value.trim();const old=editKey?qmap.get(editKey):null;const key=await addSupplierQuote(ids,{name,grade:g,price:p,stock:st,note:nt,prevKey:old?old.key:null});
+        const nq={key,name,grade:g,price:p,stock:st,note:nt,at:today(),hist:(()=>{const h=[];const pv=old||qmap.get(key);if(pv){h.push(...(pv.hist||[]));if(pv.price!==p||pv.key!==key)h.push({price:pv.price,at:pv.at,name:pv.name,grade:pv.grade})}return h.slice(-10)})()};if(NS.has(g)||NS.has("*")){NS.delete(g);NS.delete("*");its.forEach(it=>{it.noStock={...(it.noStock||{}),[g]:false,"*":false}})}
         let moved="";
         if(old&&old.key!==key){await removeSupplierQuote(ids,old.key);qmap.delete(old.key);
           // jenis berganti: pindahkan harga tawar jenis lama bila jenis lama tidak dipakai supplier lain
@@ -1550,6 +1567,9 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
     if(!g){$("#pe_hint").innerHTML=`<span class="late-tag">Tulis nama jenisnya, atau kosongkan pilihan jenis untuk semua jenis</span>`;return}
     if(g!=="*"&&[...qmap.values()].some(q=>q.grade===g)){$("#pe_hint").innerHTML=`<span class="late-tag">Jenis ${esc(g)} sudah punya harga supplier. Hapus harga itu dulu bila memang tidak ada stok.</span>`;return}
     const b=$("#pe_ns");b.disabled=true;try{await setNS(g,true);drawQ();$("#pe_hint").innerHTML=`<span class="ok-tag">✓ ${g==="*"?"Semua jenis":esc(g)} ditandai NO STOCK.</span> Di quotation otomatis tertulis NO STOCK.`}catch(err){fail(err)}finally{b.disabled=false}};
+  {const pv=prevSupPrices(f.part,ids);document.querySelectorAll("#overlay [data-peprev],#overlay2 [data-peprev]").forEach(b=>b.onclick=()=>{const x=pv[+b.dataset.peprev];if(!x)return;
+    const ch=OV.querySelector(`#pe_chips .chip[data-g="${x.grade}"]`);if(x.grade&&ch)ch.click();else if(x.grade){OV.querySelector('#pe_chips .chip[data-g="*"]')?.click();const go=OV.querySelector("#pe_go");if(go)go.value=x.grade}
+    $("#pe_sup").value=x.name;$("#pe_p").value=fmtN(x.price);$("#pe_hint").innerHTML=`Diisi dari harga ${x.kind==="b"?"beli":"penawaran"} ${fmtD(x.at)||""}. Periksa harganya masih berlaku, lalu klik <b>Simpan harga</b>.`;$("#pe_p").focus()})}
   $("#pe_q").addEventListener("click",async e=>{const nd=e.target.closest("[data-pensdel]");if(nd&&canQ){try{await setNS(nd.dataset.pensdel,false);drawQ();toast("Tanda NO STOCK dihapus")}catch(err){fail(err)}return}});
   $("#pe_q").addEventListener("click",async e=>{const u=e.target.closest("[data-peuse]"),d=e.target.closest("[data-pedel]"),ed=e.target.closest("[data-peedit]");
     if(ed&&canQ){const q=qmap.get(ed.dataset.peedit);if(!q)return;const gb=document.querySelector(`#pe_chips .chip[data-g="${CSS.escape(q.grade)}"]`);if(gb)gb.click();else{document.querySelector('#pe_chips .chip[data-g="*"]').click();$("#pe_go").value=q.grade}
@@ -2179,7 +2199,8 @@ function histRow(g){const o=g.occ;const f=o[0].it;const open=S.open.has("h:"+g.k
     <td class="num">${lc?`<b>${rp(lc.cost)}</b><div class="sub">${esc(lc.supplier)}</div>`:`<span class="sub">—</span>`}</td></tr>`+
    (open?`<tr class="hdet"><td></td><td colspan="6"><table class="mini"><thead><tr><th>Tanggal</th>${S.cust?"":"<th>Perusahaan</th>"}<th>RFQ / Quotation</th><th class="num">Qty</th><th class="num">Modal</th><th>Ditawarkan</th><th>Hasil</th></tr></thead><tbody>
      ${o.map(x=>`<tr data-id="${x.id}"><td>${dShort(x.date)}</td>${S.cust?"":`<td>${esc(x.customer)}</td>`}<td><span class="pn sub">${esc(x.rfqNo)}</span>${x.quoteNo?`<div class="pn sub">${esc(x.quoteNo)}</div>`:""}</td><td class="num">${esc(x.qty)} <span class="sub">${esc(x.unit)}</span></td>
-      <td class="num">${x.cost!=null?rp(x.cost):"—"}<div class="sub">${esc(x.supplier)}</div></td><td>${offeredTxt(x)}</td>
+      <td class="num">${x.cost!=null?rp(x.cost):"—"}<div class="sub">${esc(x.supplier)}</div>${(()=>{const qs=quotesOf(x.it);if(qs.length<1||(qs.length===1&&qs[0].name===x.supplier&&qs[0].price===x.cost&&!qs[0].hist.length))return "";
+        return `<div class="h-qs">${qs.map(q=>`<div class="${q.name===x.supplier&&q.price===x.cost?"used":""}">${gradePill(q.grade)} ${esc(q.name)} <b>${rp(q.price)}</b>${q.hist.length?` <span class="sub">(sebelumnya ${q.hist.slice().reverse().map(h=>rp(h.price)).join(", ")})</span>`:""}</div>`).join("")}</div>`})()}</td><td>${offeredTxt(x)}</td>
       <td>${resPill(x.res)}${x.res==="won"&&x.it.orderedGrade?`<div class="sub">diorder: ${esc(x.it.orderedGrade)} ${esc(x.it.orderedMode||"")}</div>`:""}${x.res==="lost"&&x.lostReason?`<div class="sub">${esc(x.lostReason)}${x.lostNote?" · "+esc(x.lostNote):""}</div>`:""}${x.poNo?`<div class="sub pn">${esc(x.poNo)}</div>`:""}</td></tr>`).join("")}
     </tbody></table></td></tr>`:"")}
 
