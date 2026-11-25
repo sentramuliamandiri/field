@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261125172533"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261125183124"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -743,10 +743,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261125172533">
-<script src="config.js?v=20261125172533"></script>
+<link rel="stylesheet" href="supa.css?v=20261125183124">
+<script src="config.js?v=20261125183124"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261125172533"></script>
+<script src="supa.js?v=20261125183124"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -2310,6 +2310,9 @@ function renderQuoteView(){
   const v=$("#viewQuotes");const q=S.q.trim().toLowerCase();
   let qs=Object.values(S.quotes||{}).filter(x=>!q||[x.no,x.d?.name||x.to,x.d?.rfqRef||x.ref].join(" ").toLowerCase().includes(q));
   const order={pending:0,revision:1,draft:2,approved:3,legacy:4};qs.sort((a,b)=>order[qStatus(a)]-order[qStatus(b)]||(b.submittedAt||0)-(a.submittedAt||0));
+  if(S.cust){const ck=custKey(S.cust);const full=findCust(S.cust);const fk=full&&full.name?custKey(full.name):"";
+    qs=qs.filter(x=>(x.rfqIds||[]).some(id=>custKey(S.rfqs[id]?.customer||"")===ck)||[ck,fk].includes(custKey(x.d?.name||x.to||"")))}
+  if(S.sup){const sk=supKey(S.sup);qs=qs.filter(x=>qRows(x).some(r=>{const it=S.items.find(i=>i.id===r.id);return it&&(supKey(it.supplier||"")===sk||quotesOf(it).some(q=>supKey(q.name)===sk))}))}
   if(S.qFilter)qs=qs.filter(x=>qStatus(x)===S.qFilter);
   resolveNames(Object.values(S.quotes||{}).flatMap(x=>[x.createdBy,(S.approvals||{})[x.id]?.by]));
   const cnt={};Object.values(S.quotes||{}).forEach(x=>{const s=qStatus(x);cnt[s]=(cnt[s]||0)+1});
@@ -2326,7 +2329,7 @@ function renderQuoteView(){
         ${st==="pending"&&!S.isApprover?`<button type="button" class="sm" data-qnotify="${x.id}">Kabari pimpinan</button>`:""}
         ${st!=="approved"&&canW()?`<button type="button" class="sm" data-qedit="${x.id}">${st==="revision"?"Perbaiki":"Ubah"}</button>`:""}
         ${st==="approved"?`<button type="button" class="sm primary" data-qpdf="${x.id}">PDF</button><button type="button" class="sm primary" data-qxls="${x.id}">Excel</button><button type="button" class="sm" data-qwa="${x.id}">Salin WA</button><button type="button" class="sm" data-qpo="${x.id}">Hasil PO</button>${canW()?`<button type="button" class="sm ghost" data-qedit="${x.id}" title="Ubah quotation; perlu disetujui ulang">Revisi</button>`:""}`:`<button type="button" class="sm ghost" data-qdraft="${x.id}">PDF draft</button><button type="button" class="sm ghost" data-qdraftx="${x.id}">Excel draft</button>`}${canW()?`<button type="button" class="sm ghost" data-qdupq="${x.id}" title="Buat quotation baru (nomor baru) dengan isi yang sama, mis. untuk Franco Site">Duplikat</button>`:""}${st!=="approved"&&canW()?`<button type="button" class="sm ghost danger" data-qdel="${x.id}" title="Hapus quotation">Hapus</button>`:""}`}</td></tr>`}).join("")}</tbody></table></div>`
-   :`<div class="tbl-wrap"><div class="empty"><h3>Belum ada quotation${S.qFilter?" dengan status ini":""}</h3><p>Buat quotation dari tombol <b>Quotation</b> di baris RFQ, atau centang item lalu <b>Buat quotation</b>.</p></div></div>`);
+   :`<div class="tbl-wrap"><div class="empty"><h3>Belum ada quotation${S.qFilter?" dengan status ini":""}${S.cust?` untuk ${esc(S.cust)}`:""}${S.sup?` dengan barang dari ${esc(S.sup)}`:""}</h3><p>Buat quotation dari tombol <b>Quotation</b> di baris RFQ, atau centang item lalu <b>Buat quotation</b>.</p></div></div>`);
 }
 async function submitQuote(asApprover){
   const d=quoteData();if(!d.rows.length){toast("Tidak ada item yang disertakan");return false}
