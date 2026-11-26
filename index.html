@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261126144514"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261126145714"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -750,10 +750,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261126144514">
-<script src="config.js?v=20261126144514"></script>
+<link rel="stylesheet" href="supa.css?v=20261126145714">
+<script src="config.js?v=20261126145714"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261126144514"></script>
+<script src="supa.js?v=20261126145714"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1172,6 +1172,7 @@ const custList=()=>Object.values(S.customers||{}).filter(c=>c&&c.name).sort((a,b
 function nextQNo(){const c=qc();const d=new Date();return `${(Number(c.qCounter)||0)+1}/SMM-QUOT/${ROM[d.getMonth()]}/${d.getFullYear()}`}
 let Q=null;
 function openQuote(ids,qid,opt={}){
+  S.quoteMissOk=false;
   if(!qid&&!opt.fresh){const want=new Set(ids.filter(id=>{const i=S.items.find(x=>x.id===id);return i&&i.status!=="batal"}));
     const ex=want.size?Object.values(S.quotes||{}).filter(q=>q.d&&(q.d.rows||[]).length&&[...want].every(id=>(q.d.rows||[]).some(r=>r.id===id))).sort((a,b)=>(b.submittedAt||b.createdAt||0)-(a.submittedAt||a.createdAt||0))[0]:null;
     if(ex){openQuote([],ex.id,{fromIds:ids});return}}
@@ -2369,7 +2370,7 @@ async function submitQuote(asApprover){
   const ids0={};d.rows.forEach(r=>(ids0[r.id]=ids0[r.id]||[]).push(normGrade(r.brand)));
   if(Object.values(ids0).some(bs=>bs.length>1&&(bs.some(b=>!b)||new Set(bs).size<bs.length))){toast("Part yang punya beberapa baris wajib diberi Brand/jenis berbeda (mis. OEM dan GENUINE)");return false}
   const miss=d.rows.filter(r=>!r.ns&&r.d===""&&r.l==="").length;
-  if(miss&&S.isApprover&&!S.quoteMissOk){S.quoteMissOk=true;toast(`${miss} item belum ada harga. Klik sekali lagi untuk tetap menyetujui.`);return false}
+  if(miss&&S.isApprover&&!S.quoteMissOk){S.quoteMissOk=true;clearTimeout(S.qmT);S.qmT=setTimeout(()=>{S.quoteMissOk=false},8000);toast(`${miss} item belum ada harga. Klik sekali lagi untuk tetap menyetujui.`);return false}
   S.quoteMissOk=false;
   const now=Date.now();const id=Q.editId||S.db.collection("quotes").doc().id;const old=(S.quotes||{})[id];
   const rec={no:d.no,d:{...d,rows:d.rows.map(r=>({id:r.id,group:r.group,desc:r.desc,qty:r.qty,unit:r.unit,g:r.g,d:r.d,l:r.l,price:r.price,brand:r.brand,...(r.ns?{ns:true}:{}),...(r.via?{via:r.via}:{}),...(r.stk?{stk:r.stk,eta:r.eta||""}:{}),...(r.src?{src:r.src}:{})}))},rfqIds:Q.rfqIds,
