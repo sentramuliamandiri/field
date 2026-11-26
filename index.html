@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261126143710"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1b3264"><meta name="smm-build" content="20261126144514"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMM Tracking"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* ===== v41 mobile-first layer (HP Android & iOS) ===== */
 #bnav,#fab,#moreSheet{display:none}
 @media (max-width:640px){
@@ -750,10 +750,10 @@ a{color:var(--ink)}
 <div id="overlay"></div><div id="overlay2"></div>
 <div id="toast" class="toast" hidden></div>
 
-<link rel="stylesheet" href="supa.css?v=20261126143710">
-<script src="config.js?v=20261126143710"></script>
+<link rel="stylesheet" href="supa.css?v=20261126144514">
+<script src="config.js?v=20261126144514"></script>
 <script src="vendor/supabase.js"></script>
-<script src="supa.js?v=20261126143710"></script>
+<script src="supa.js?v=20261126144514"></script>
 <script>
 const STATUSES=[
  {k:"baru",l:"Belum Diproses",c:"--s-baru"},
@@ -1541,7 +1541,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
   const hasQ=g=>[...qmap.values()].some(q=>q.grade===g);
   const confirmRen=ng=>{toast(`Jenis ${ng} sudah punya harga tawar, ganti nama dibatalkan`);return false};
   const offerGrades=()=>{const used=new Set([...O.entries()].filter(([g,o])=>o&&o.src).map(([g,o])=>srcG(o.src)));
-    return sortG([...new Set([...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()])]).filter(g=>{if(!used.has(g))return true;const o=O.get(g);return o&&(o.l!==""&&o.l!=null||o.d!==""&&o.d!=null)})};
+    return sortG([...new Set([...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()])]).filter(g=>{if(g===""){const o=O.get("");const others=[...[...qmap.values()].map(q=>q.grade).filter(Boolean),...O.keys()].filter(k=>k!=="");return (o&&(o.l!==""||o.d!==""))||!others.length}if(!used.has(g))return true;const o=O.get(g);return o&&(o.l!==""&&o.l!=null||o.d!==""&&o.d!=null)})};
   const setNS=async(g,on)=>{const p={noStock:{[g]:on}};if(on&&g==="*")[...NS.keys()].forEach(k=>p.noStock[k]=k==="*");
     for(let i=0;i<ids.length;i+=8)await Promise.all(ids.slice(i,i+8).map(id=>S.db.doc("items/"+id).update(stamp(p))));
     its.forEach(it=>{it.noStock={...(it.noStock||{}),...p.noStock}});NS.clear();Object.entries(f.noStock||{}).filter(([k,v])=>v).forEach(([k])=>NS.set(k,true))};
@@ -1573,7 +1573,7 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
      ${lo?`<div class="pe-last">Riwayat: ${offerLine(lo).replace(/<\/?div[^>]*>/g,"")}</div>`:""}
      ${(()=>{const rids=[...new Set(its.map(i=>i.rfqId))];const r=S.rfqs[rids[0]]||{};const l=Number(r.ongkirL)>0,u=Number(r.ongkirU)>0;
        return `<div class="pe-fbar">${l||u?`Ongkir pengiriman ke ${esc(r.customer||"customer")} (total RFQ): ${l?`laut <b>${rp(r.ongkirL)}</b>`:""}${l&&u?" · ":""}${u?`udara <b>${rp(r.ongkirU)}</b>`:""} — sudah dibagi ke biaya di bawah.`:`<span class="late-tag">Ongkir pengiriman RFQ ini belum diisi</span> Biaya di bawah masih modal saja.`} ${canW()&&rids.length===1&&!opt.stack?`<button type="button" class="linkbtn" data-freight="${rids[0]}">${l||u?"Ubah":"Isi ongkir"}</button>`:""}</div>`})()}
-     ${canSell?`<div class="pe-form pe-oform"><div class="pe-lbl">Jenis barang <span class="sub">— pilih jenis yang ditawarkan, lalu isi harga & stok di bawah</span></div><div class="chips pe-addchips">${GRADES.map(g=>`<button type="button" class="chip" data-addg="${g}" style="--c:var(${GCOL[g]||"--s-tawar"})">${g}</button>`).join("")}<button type="button" class="chip" data-addg="*">LAINNYA…</button><input id="pe_addo" class="sm" placeholder="tulis jenis, lalu Enter" hidden style="max-width:200px"></div></div>`:""}
+     ${canSell?`<div class="pe-form pe-oform"><div class="pe-lbl">Jenis barang <span class="sub">— opsional. Klik untuk menambah/menamai baris, atau langsung isi harga di bawah</span></div><div class="chips pe-addchips">${GRADES.map(g=>`<button type="button" class="chip" data-addg="${g}" style="--c:var(${GCOL[g]||"--s-tawar"})">${g}</button>`).join("")}<button type="button" class="chip" data-addg="*">LAINNYA…</button><input id="pe_addo" class="sm" placeholder="tulis jenis, lalu Enter" hidden style="max-width:200px"></div></div>`:""}
      <div id="pe_o"></div>
      ${canSell?`<div class="bar" style="margin-top:8px"><button type="button" class="sm" id="pe_fill">Isi otomatis dari biaya +${S.markup}%</button><select id="pe_addg" hidden aria-hidden="true"><option value=""></option></select></div>`:""}
     </section>
@@ -1591,21 +1591,21 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
        <div class="pe-act">${used?`<span class="tag-used" title="Dipakai sebagai modal pembelian">✓ dipakai beli</span>`:canQ?`<button type="button" class="sm ghost" data-peuse="${esc(q.key)}">Pakai beli</button>`:""}${canQ?`<button type="button" class="ghost sm" data-peedit="${esc(q.key)}">Ubah</button><button type="button" class="ghost sm danger" data-pedel="${esc(q.key)}" aria-label="Hapus">✕</button>`:""}</div></div>`}).join("")}</div>`
       :legacy?`<div class="dupnote">Ada harga lama ${rp(f.price)} ${f.supplier?"dari "+esc(f.supplier):""} tanpa jenis. Masukkan ulang dengan jenisnya di bawah.</div>`
       :`<p class="sub pe-empty">${(f.askedTo||[]).length?`Sudah ditanyakan ke ${esc(f.askedTo.join(", "))}; belum ada harga.`:"Belum ada harga supplier."}</p>`};
-  const drawO=()=>{const gs=offerGrades();const dis=canSell?"":"disabled";OV.querySelectorAll(".pe-oform [data-addg]").forEach(b=>{const on=gs.includes(b.dataset.addg);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});
+  const drawO=()=>{if(canSell&&!offerGrades().length)O.set("",O.get("")||{d:"",l:""});const gs=offerGrades();const dis=canSell?"":"disabled";OV.querySelectorAll(".pe-oform [data-addg]").forEach(b=>{const on=gs.includes(b.dataset.addg);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});
     if(!gs.length){$("#pe_o").innerHTML=`<p class="sub pe-empty">${canSell?"Pilih jenis barang di atas untuk mulai mengisi harga tawar.":"Belum ada harga tawar."}</p>`;return}
     const mgf=(v,c)=>c>0&&Number(v)>0?`<span class="${v<c?"neg":"pos"}">${((v-c)/v*100).toFixed(1).replace(".",",")}%</span>`:`<span class="sub">—</span>`;
     const costCell=(g,m)=>{const c=costM(g,m);return c>0?`<b>${rp(c)}</b>${hasL(g,m)?`<span class="sub">${m==="l"?"laut":"udara"} · modal + ongkir</span>`:`<span class="sub">${m==="l"?"laut":"udara"} · modal saja</span>`}`:`<span class="sub">—</span>`};
     $("#pe_o").innerHTML=`<div class="pe-grid g6"><div class="pe-gh"><span>Jenis</span><span class="r">Biaya laut</span><span class="r">Harga Laut</span><span class="r">Biaya udara</span><span class="r">Harga Udara</span><span class="r">Margin L / U</span></div>
      ${gs.map(g=>{const o=O.get(g)||{d:"",l:""};
       const sg=o.src?srcG(o.src):(hasQ(g)?g:"");
-      return `<div class="pe-gr"><div class="pe-gcell">${canSell?`<input class="pe-gname" data-oren="${esc(g)}" value="${esc(g)}" list="dlGradeO" aria-label="Jenis yang ditulis di quotation" title="Ketik jenis yang ditulis di quotation, mis. GENUINE">`:gradePill(g)}${sg&&sg!==g?`<span class="sub">supplier: <b>${esc(sg)}</b></span>`:(sg?`<span class="sub">sesuai supplier</span>`:"")}</div><span class="r pe-cost">${costCell(g,"l")}</span>
+      return `<div class="pe-gr"><div class="pe-gcell">${canSell?`<input class="pe-gname" data-oren="${esc(g)}" value="${esc(g)}" list="dlGradeO" placeholder="jenis (opsional)" aria-label="Jenis yang ditulis di quotation" title="Ketik jenis yang ditulis di quotation, mis. GENUINE">`:gradePill(g)}${sg&&sg!==g?`<span class="sub">supplier: <b>${esc(sg)}</b></span>`:(sg?`<span class="sub">sesuai supplier</span>`:"")}</div><span class="r pe-cost">${costCell(g,"l")}</span>
        <span class="rpw"><span>Rp</span><input data-ol="${esc(g)}" inputmode="numeric" value="${o.l===""?"":fmtN(o.l)}" placeholder="${canSell?"laut":"—"}" ${dis}></span>
        <span class="r pe-cost">${costCell(g,"d")}</span>
        <span class="rpw"><span>Rp</span><input data-od="${esc(g)}" inputmode="numeric" value="${o.d===""?"":fmtN(o.d)}" placeholder="${canSell?"udara":"—"}" ${dis}></span>
        <span class="r pe-mg"><span data-mg="${esc(g)}">${mgf(o.l,costM(g,"l"))}<span class="sub"> / </span>${mgf(o.d,costM(g,"d"))}</span>${canSell&&(o.l!==""||o.d!==""||!hasQ(g))?`<button type="button" class="ghost sm danger pe-odel" data-odel="${esc(g)}" title="Hapus harga tawar ${esc(g)}" aria-label="Hapus harga tawar ${esc(g)}">✕</button>`:""}</span>
        <div class="pe-stk">${(()=>{const sg=[...new Set([...qmap.values()].map(q=>q.grade))];if(sg.length<2)return "";const cur=o.src||"";
          return `<span class="sub">Modal dari</span><select data-osrc="${esc(g)}" ${dis} aria-label="Modal dari harga supplier"><option value="" ${!cur?"selected":""}>${sg.includes(g)?`${esc(g)} (sama)`:"— pilih harga supplier"}</option>${sg.filter(x=>x!==g).map(x=>{const c=costG(x);return `<option value="${esc(x||"-")}" ${(cur&&srcG(cur)===x)?"selected":""}>${esc(x||"Tanpa jenis")}${c>0?" · "+rp(c):""}</option>`}).join("")}</select><span class="pe-sep"></span>`})()}<span class="sub">Stok</span><select data-os="${esc(g)}" ${dis} aria-label="Stok ${esc(g)}"><option value="">— (tidak ditulis)</option><option value="ready" ${o.stk==="ready"?"selected":""}>Ready stock</option><option value="indent" ${o.stk==="indent"?"selected":""}>Indent</option></select><input data-oe="${esc(g)}" value="${esc(o.eta||"")}" placeholder="lama indent, mis. 2-3 minggu" ${o.stk==="indent"?"":"hidden"} ${dis}></div></div>`}).join("")}</div>`;
-    $("#pe_o").querySelectorAll("input[data-oren]").forEach(el=>el.addEventListener("change",()=>{const g=el.dataset.oren;const ng=normGrade(el.value);if(!ng||ng===g){el.value=g;return}
+    $("#pe_o").querySelectorAll("input[data-oren]").forEach(el=>el.addEventListener("change",()=>{const g=el.dataset.oren;const ng=normGrade(el.value);if(ng===g){el.value=g;return}if(!ng&&g){el.value=g;return}
       const o={...(O.get(g)||{d:"",l:""})};const src=o.src?srcG(o.src):(hasQ(g)?g:"");O.delete(g);
       const ex=O.get(ng);if(ex&&(ex.l!==""||ex.d!=="")&&!confirmRen(ng)){O.set(g,o);el.value=g;return}
       if(src&&src!==ng)o.src=src||"-";else delete o.src;O.set(ng,o);drawO();const nx=$(`#pe_o [data-ol="${CSS.escape(ng)}"]`);if(nx)nx.focus()}));
@@ -1652,7 +1652,9 @@ function openPriceEditor(ids,opt={}){const OV=opt.stack?$("#overlay2"):$("#overl
     if(d){const k=d.dataset.pedel;if(S.peDel!==k){S.peDel=k;d.textContent="Hapus?";d.classList.add("armed");setTimeout(()=>{if(S.peDel===k){S.peDel=null;d.textContent="✕";d.classList.remove("armed")}},4000);return}S.peDel=null;
       try{await removeSupplierQuote(ids,k);qmap.delete(k);drawQ();drawO();toast("Harga supplier dihapus")}catch(err){fail(err)}}});
   if(canSell){
-    const addG=g=>{g=normGrade(g);if(!g)return;if(!O.has(g)){const qs=[...qmap.values()];const o={d:"",l:""};if(qs.length&&!qs.some(q=>q.grade===g)){const ch=qs.reduce((a,c)=>c.price<a.price?c:a);o.src=ch.grade||"-"}O.set(g,o)}drawO();const el=$(`#pe_o [data-ol="${CSS.escape(g)}"]`);if(el)el.focus()};
+    const offered=sg=>{const o=O.get(sg);return !!(o&&(o.l!==""&&o.l!=null||o.d!==""&&o.d!=null))};
+    const addG=g=>{g=normGrade(g);if(!g)return;
+      if(O.has("")&&offerGrades().length===1&&!O.has(g)){const o=O.get("");O.delete("");const qs=[...qmap.values()];if(qs.length&&!qs.some(q=>q.grade===g)&&!o.src){const ch=qs.reduce((a,c)=>c.price<a.price?c:a);if(!offered(ch.grade))o.src=ch.grade||"-"}O.set(g,o);drawO();const el=$(`#pe_o [data-ol="${CSS.escape(g)}"]`);if(el)el.focus();return}if(!O.has(g)){const qs=[...qmap.values()];const o={d:"",l:""};if(qs.length&&!qs.some(q=>q.grade===g)){const ch=qs.reduce((a,c)=>c.price<a.price?c:a);if(!offered(ch.grade))o.src=ch.grade||"-"}O.set(g,o)}drawO();const el=$(`#pe_o [data-ol="${CSS.escape(g)}"]`);if(el)el.focus()};
     $("#pe_addg").onchange=e=>{const g=e.target.value;e.target.value="";if(g==="*"){$("#pe_addo").hidden=false;$("#pe_addo").focus();return}addG(g)};
     OV.querySelectorAll("[data-addg]").forEach(b=>b.onclick=()=>{const g=b.dataset.addg;if(g==="*"){$("#pe_addo").hidden=false;$("#pe_addo").focus();return}addG(g)});
     $("#pe_addo").onchange=e=>{addG(e.target.value);e.target.value="";e.target.hidden=true};
